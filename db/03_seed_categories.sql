@@ -1,0 +1,86 @@
+BEGIN;
+
+INSERT INTO "Categoria" ("Nombre") VALUES
+    ('Anatomy'),
+    ('Biochemistry'),
+    ('Biology'),
+    ('Biophysics'),
+    ('Biotechnology'),
+    ('Chronobiology Discipline'),
+    ('Neurosciences'),
+    ('Pharmacology'),
+    ('Physiology'),
+    ('Toxicology'),
+    ('Cheminformatics'),
+    ('Chemistry Agricultural'),
+    ('Chemistry Analytic'),
+    ('Chemistry Clinical'),
+    ('Chemistry Inorganic'),
+    ('Chemistry Organic'),
+    ('Chemistry Pharmaceutical'),
+    ('Chemistry Physical'),
+    ('Computational Chemistry'),
+    ('Microchemistry'),
+    ('Astronomy'),
+    ('Geography'),
+    ('Geology'),
+    ('Limnology'),
+    ('Meteorology'),
+    ('Oceanography'),
+    ('Paleontology'),
+    ('Acoustics'),
+    ('Electronics'),
+    ('Health Physics'),
+    ('Magnetics'),
+    ('Mechanics'),
+    ('Nuclear Physics'),
+    ('Optics and Photonics'),
+    ('Rheology'),
+    ('Computer')
+ON CONFLICT ("Nombre") DO NOTHING;
+
+INSERT INTO "Area_Categoria" ("IdArea", "IdCategoria")
+SELECT a."Id", c."Id"
+FROM (VALUES
+    ('BIO',  'Anatomy'),
+    ('BIO',  'Biochemistry'),
+    ('BIO',  'Biology'),
+    ('BIO',  'Biophysics'),
+    ('BIO',  'Biotechnology'),
+    ('BIO',  'Chronobiology Discipline'),
+    ('BIO',  'Neurosciences'),
+    ('BIO',  'Pharmacology'),
+    ('BIO',  'Physiology'),
+    ('BIO',  'Toxicology'),
+    ('CHEM', 'Cheminformatics'),
+    ('CHEM', 'Chemistry Agricultural'),
+    ('CHEM', 'Chemistry Analytic'),
+    ('CHEM', 'Chemistry Clinical'),
+    ('CHEM', 'Chemistry Inorganic'),
+    ('CHEM', 'Chemistry Organic'),
+    ('CHEM', 'Chemistry Pharmaceutical'),
+    ('CHEM', 'Chemistry Physical'),
+    ('CHEM', 'Computational Chemistry'),
+    ('CHEM', 'Microchemistry'),
+    ('EARTH','Astronomy'),
+    ('EARTH','Geography'),
+    ('EARTH','Geology'),
+    ('EARTH','Limnology'),
+    ('EARTH','Meteorology'),
+    ('EARTH','Oceanography'),
+    ('EARTH','Paleontology'),
+    ('PHYS', 'Acoustics'),
+    ('PHYS', 'Electronics'),
+    ('PHYS', 'Health Physics'),
+    ('PHYS', 'Magnetics'),
+    ('PHYS', 'Mechanics'),
+    ('PHYS', 'Nuclear Physics'),
+    ('PHYS', 'Optics and Photonics'),
+    ('PHYS', 'Rheology'),
+    ('CS',   'Computer')
+) AS v(area_nombre, categoria_nombre)
+JOIN "Area"       a ON a."Nombre" = v.area_nombre
+JOIN "Categoria"  c ON c."Nombre" = v.categoria_nombre
+ON CONFLICT ("IdArea", "IdCategoria") DO NOTHING;
+
+COMMIT;
