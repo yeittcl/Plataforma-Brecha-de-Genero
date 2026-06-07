@@ -19,8 +19,12 @@ venv/
 env/
 
 # Project-specific (data is gitignored per AGENTS.md)
-data/
-!data/.gitkeep
+data/**
+!data/**/
+!data/**/.gitkeep
+
+# Local backup of the original (unordered) data dump. Not part of the repo.
+originalData/
 
 # Secrets
 .env
