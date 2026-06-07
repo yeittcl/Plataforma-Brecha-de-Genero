@@ -24,7 +24,7 @@ Data flows left to right:
 - `db/` — DDL / migrations for Postgres and ClickHouse
 - `superset/` — exported dashboards, config assets
 - `data/` — CSVs (gitignored, large/raw)
-- `docker-compose.yml` — Postgres + ClickHouse + Superset for local dev
+- `docker-compose.yml` — Postgres + ClickHouse for local dev (Superset is added in EPIC-03)
 - `requirements.txt` — Python deps
 - `.env.example` — connection strings, credentials
 

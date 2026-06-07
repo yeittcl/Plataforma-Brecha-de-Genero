@@ -11,7 +11,7 @@ en el mismo PR que cierra cada task.
 - [x] **TASK-01-002** — Crear `db/01_schema.sql` con DDL de las 12 tablas + constraints
 - [x] **TASK-01-003** — Crear `db/02_seed_static.sql` (Region, Pais, Area, Posicion)
 - [x] **TASK-01-004** — Crear `db/03_seed_categories.sql` (36 pares Area-Categoria)
-- [ ] **TASK-01-005** — Crear `requirements.txt` + `docker-compose.yml` (Postgres + ClickHouse) + `.env.example` + `.gitignore`
+- [x] **TASK-01-005** — Crear `requirements.txt` + `docker-compose.yml` (Postgres + ClickHouse) + `.env.example` + `.gitignore`
 - [ ] **TASK-01-006** — Crear `etl/common.py` (env vars, conexión DB, mapeo `fist→first`, normalizador de países)
 - [ ] **TASK-01-007** — Implementar `etl/load_postgres.py` (DF1 + DF2 + PubMed + DBLP → Postgres)
 - [ ] **TASK-01-008** — Implementar `etl/load_postgres_publishers.py` (OpenAlex `/publishers` + `/sources`)
