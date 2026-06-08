@@ -65,7 +65,7 @@ def ensure_paper_by_doi(conn, doi, title, year, id_journal, id_categoria, id_pai
         return None
     with conn.cursor() as cur:
         cur.execute(
-            """INSERT INTO "Paper" ("Titulo", "Anio", "doi", "Id_Journal", "Id_Categoria", "Id_Pais")
+            """INSERT INTO "Paper" ("Titulo", "Año", "doi", "Id_Journal", "Id_Categoria", "Id_Pais")
                VALUES (%s, %s, %s, %s, %s, %s)
                ON CONFLICT (doi) DO NOTHING
                RETURNING "Id" """,
@@ -83,7 +83,7 @@ def ensure_paper_by_doi(conn, doi, title, year, id_journal, id_categoria, id_pai
 def ensure_paper_by_pmid(conn, pubmed_id, doi, title, year, id_journal, id_categoria, id_pais, journal_lookup):
     with conn.cursor() as cur:
         cur.execute(
-            """INSERT INTO "Paper" ("Titulo", "Anio", "doi", "Id_Journal", "Id_Categoria", "Id_Pais")
+            """INSERT INTO "Paper" ("Titulo", "Año", "doi", "Id_Journal", "Id_Categoria", "Id_Pais")
                VALUES (%s, %s, %s, %s, %s, %s)
                ON CONFLICT (doi) DO NOTHING
                RETURNING "Id" """,
@@ -99,7 +99,7 @@ def ensure_paper_by_pmid(conn, pubmed_id, doi, title, year, id_journal, id_categ
             if row:
                 return row[0]
         cur.execute(
-            "SELECT \"Id\" FROM \"Paper\" WHERE \"Titulo\" = %s AND \"Anio\" = %s AND \"Id_Journal\" = %s",
+            "SELECT \"Id\" FROM \"Paper\" WHERE \"Titulo\" = %s AND \"Año\" = %s AND \"Id_Journal\" = %s",
             (title.strip() if title else None, year, id_journal),
         )
         row = cur.fetchone()
@@ -111,9 +111,9 @@ def ensure_paper_by_natural_key(conn, title, year, journal_name, id_journal, id_
         return None
     with conn.cursor() as cur:
         cur.execute(
-            """INSERT INTO "Paper" ("Titulo", "Anio", "Id_Journal", "Id_Categoria", "Id_Pais")
+            """INSERT INTO "Paper" ("Titulo", "Año", "Id_Journal", "Id_Categoria", "Id_Pais")
                VALUES (%s, %s, %s, %s, %s)
-               ON CONFLICT ("Titulo", "Anio", "Id_Journal") DO NOTHING
+               ON CONFLICT ("Titulo", "Año", "Id_Journal") DO NOTHING
                RETURNING "Id" """,
             (truncate(title.strip(), 1000), year, id_journal, id_categoria, id_pais),
         )
@@ -121,7 +121,7 @@ def ensure_paper_by_natural_key(conn, title, year, journal_name, id_journal, id_
         if row:
             return row[0]
         cur.execute(
-            "SELECT \"Id\" FROM \"Paper\" WHERE \"Titulo\" = %s AND \"Anio\" = %s AND \"Id_Journal\" = %s",
+            "SELECT \"Id\" FROM \"Paper\" WHERE \"Titulo\" = %s AND \"Año\" = %s AND \"Id_Journal\" = %s",
             (title.strip(), year, id_journal),
         )
         row = cur.fetchone()

@@ -12,15 +12,15 @@ CHUNK_SIZE = 10_000
 
 def load_df1(conn, filepath, area_nombre, categoria_lookup, pais_lookup, journal_lookup):
     log.info(f"Loading DF1: {filepath} (area={area_nombre})")
-    cat_id = categoria_lookup.get(area_nombre)
-    if not cat_id:
-        log.warning(f"Area {area_nombre} not found in Categoria, skipping")
+    if not categoria_lookup:
+        log.warning("Categoria lookup is empty, skipping")
         return {}, {}
 
     doi_to_paper_id = {}
     counter_area_to_doi = {}
     seen_counter_area = set()
     row_count = 0
+    skipped_no_category = 0
 
     for chunk in pd.read_csv(
         filepath,
@@ -55,8 +55,11 @@ def load_df1(conn, filepath, area_nombre, categoria_lookup, pais_lookup, journal
             journal_name = str(row["Journal"]).strip() if not pd.isna(row["Journal"]) else None
             jid = ensure_journal(conn, journal_name, journal_lookup) if journal_name else None
 
-            mesh_cat = str(row["mesh_major"]).strip() if not pd.isna(row["mesh_major"]) else area_nombre
-            cat_row_id = categoria_lookup.get(mesh_cat, cat_id)
+            mesh_cat = str(row["mesh_major"]).strip() if not pd.isna(row["mesh_major"]) else None
+            cat_row_id = categoria_lookup.get(mesh_cat) if mesh_cat else None
+            if not cat_row_id:
+                skipped_no_category += 1
+                continue
 
             title = f"Paper-{doi}"
             paper_id = ensure_paper_by_doi(conn, doi, title, year, jid, cat_row_id, pais_id, journal_lookup)
@@ -65,9 +68,9 @@ def load_df1(conn, filepath, area_nombre, categoria_lookup, pais_lookup, journal
 
         if row_count % 50_000 == 0:
             log.info(f"  DF1 {area_nombre}: {row_count} rows, {len(doi_to_paper_id)} papers, "
-                     f"{len(counter_area_to_doi)} counter-area groups")
+                     f"{len(counter_area_to_doi)} counter-area groups, {skipped_no_category} no-category")
 
     conn.commit()
     log.info(f"  DF1 {area_nombre} done: {row_count} rows, {len(doi_to_paper_id)} papers, "
-             f"{len(counter_area_to_doi)} counter-area groups")
+             f"{len(counter_area_to_doi)} counter-area groups, {skipped_no_category} no-category")
     return doi_to_paper_id, counter_area_to_doi

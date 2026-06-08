@@ -70,9 +70,9 @@ def update_journal_issn(conn, jid, issn_raw):
 def insert_factor_impacto(conn, year, valor, jid):
     with conn.cursor() as cur:
         cur.execute(
-            """INSERT INTO "Factor_Impacto" ("Anio", "Valor", "Id_Journal")
+            """INSERT INTO "Factor_Impacto" ("Año", "Valor", "Id_Journal")
                VALUES (%s, %s, %s)
-               ON CONFLICT ("Id_Journal", "Anio") DO NOTHING""",
+               ON CONFLICT ("Id_Journal", "Año") DO NOTHING""",
             (year, valor, jid),
         )
         return cur.rowcount > 0

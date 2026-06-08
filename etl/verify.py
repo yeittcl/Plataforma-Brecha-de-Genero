@@ -94,10 +94,10 @@ def check_data_quality(conn):
             print(f"    {genero:15s} {n:>10,}  ({pct:.1f}%)")
 
         cur.execute("""
-            SELECT "Anio", COUNT(*) AS n
+            SELECT "Año", COUNT(*) AS n
             FROM "Paper"
-            WHERE "Anio" IS NOT NULL
-            GROUP BY "Anio"
+            WHERE "Año" IS NOT NULL
+            GROUP BY "Año"
             ORDER BY n DESC
             LIMIT 5
         """)
@@ -133,7 +133,7 @@ def check_data_quality(conn):
 def check_performance(conn):
     header("Performance (EXPLAIN)")
     queries = [
-        ("Paper por anio", 'SELECT * FROM "Paper" WHERE "Anio" = 2021'),
+        ("Paper por anio", 'SELECT * FROM "Paper" WHERE "Año" = 2021'),
         ("Contribucion por paper", 'SELECT * FROM "Contribucion" WHERE "IdPaper" = 1'),
         ("Contar mujeres", 'SELECT COUNT(*) FROM "Investigador" WHERE "Genero" = \'female\''),
     ]
