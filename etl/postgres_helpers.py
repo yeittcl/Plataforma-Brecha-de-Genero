@@ -60,70 +60,21 @@ def ensure_journal(conn, journal_name, journal_lookup):
     return None
 
 
-def ensure_paper_by_doi(conn, doi, title, year, id_journal, id_categoria, id_pais, journal_lookup):
+def ensure_paper_by_doi(conn, doi, year, id_journal, id_categoria, id_pais):
     if not doi or not doi.strip():
         return None
     with conn.cursor() as cur:
         cur.execute(
-            """INSERT INTO "Paper" ("Titulo", "Año", "doi", "Id_Journal", "Id_Categoria", "Id_Pais")
-               VALUES (%s, %s, %s, %s, %s, %s)
-               ON CONFLICT (doi) DO NOTHING
-               RETURNING "Id" """,
-            (truncate(title.strip() if title else "Untitled", 1000), year, doi.strip(),
-             id_journal, id_categoria, id_pais),
-        )
-        row = cur.fetchone()
-        if row:
-            return row[0]
-        cur.execute("SELECT \"Id\" FROM \"Paper\" WHERE doi = %s", (doi.strip(),))
-        row = cur.fetchone()
-        return row[0] if row else None
-
-
-def ensure_paper_by_pmid(conn, pubmed_id, doi, title, year, id_journal, id_categoria, id_pais, journal_lookup):
-    with conn.cursor() as cur:
-        cur.execute(
-            """INSERT INTO "Paper" ("Titulo", "Año", "doi", "Id_Journal", "Id_Categoria", "Id_Pais")
-               VALUES (%s, %s, %s, %s, %s, %s)
-               ON CONFLICT (doi) DO NOTHING
-               RETURNING "Id" """,
-            (truncate(title.strip() if title else "Untitled", 1000), year,
-             doi if doi else None, id_journal, id_categoria, id_pais),
-        )
-        row = cur.fetchone()
-        if row:
-            return row[0]
-        if doi:
-            cur.execute("SELECT \"Id\" FROM \"Paper\" WHERE doi = %s", (doi,))
-            row = cur.fetchone()
-            if row:
-                return row[0]
-        cur.execute(
-            "SELECT \"Id\" FROM \"Paper\" WHERE \"Titulo\" = %s AND \"Año\" = %s AND \"Id_Journal\" = %s",
-            (title.strip() if title else None, year, id_journal),
-        )
-        row = cur.fetchone()
-        return row[0] if row else None
-
-
-def ensure_paper_by_natural_key(conn, title, year, journal_name, id_journal, id_categoria, id_pais, journal_lookup):
-    if not title:
-        return None
-    with conn.cursor() as cur:
-        cur.execute(
-            """INSERT INTO "Paper" ("Titulo", "Año", "Id_Journal", "Id_Categoria", "Id_Pais")
+            """INSERT INTO "Paper" ("Año", "Doi", "Id_Journal", "Id_Categoria", "Id_Pais")
                VALUES (%s, %s, %s, %s, %s)
-               ON CONFLICT ("Titulo", "Año", "Id_Journal") DO NOTHING
+               ON CONFLICT ("Doi") DO NOTHING
                RETURNING "Id" """,
-            (truncate(title.strip(), 1000), year, id_journal, id_categoria, id_pais),
+            (year, doi.strip(), id_journal, id_categoria, id_pais),
         )
         row = cur.fetchone()
         if row:
             return row[0]
-        cur.execute(
-            "SELECT \"Id\" FROM \"Paper\" WHERE \"Titulo\" = %s AND \"Año\" = %s AND \"Id_Journal\" = %s",
-            (title.strip(), year, id_journal),
-        )
+        cur.execute("SELECT \"Id\" FROM \"Paper\" WHERE \"Doi\" = %s", (doi.strip(),))
         row = cur.fetchone()
         return row[0] if row else None
 

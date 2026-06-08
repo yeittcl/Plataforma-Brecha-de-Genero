@@ -77,13 +77,11 @@ CREATE TABLE "Investigador" (
 
 CREATE TABLE "Paper" (
     "Id"                BIGSERIAL    PRIMARY KEY,
-    "Titulo"            TEXT         NOT NULL,
     "Año"               INT          NOT NULL,
-    "Fecha_Publicacion" DATE         NULL,
     "Id_Journal"        INT          NOT NULL,
     "Id_Pais"           INT          NOT NULL,
     "Id_Categoria"      INT          NOT NULL,
-    "doi"               VARCHAR(200) NULL UNIQUE,
+    "Doi"               VARCHAR(200) NULL UNIQUE,
     FOREIGN KEY ("Id_Journal")   REFERENCES "Journal"("Id")    ON DELETE RESTRICT,
     FOREIGN KEY ("Id_Pais")      REFERENCES "Pais"("Id")       ON DELETE RESTRICT,
     FOREIGN KEY ("Id_Categoria") REFERENCES "Categoria"("Id") ON DELETE RESTRICT
