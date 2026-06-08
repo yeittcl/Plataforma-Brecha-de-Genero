@@ -12,10 +12,10 @@ def load_gender_lookup(filepath="data/raw/gender_lookup.csv"):
     gender_map = {}
     chunks = pd.read_csv(
         filepath,
-        header=None,
-        names=["firstname", "genero", "probabilidad"],
+        header=0,
         chunksize=CHUNK_SIZE,
         dtype={"firstname": str, "genero": str, "probabilidad": float},
+        on_bad_lines="skip",
     )
     for chunk in chunks:
         for _, row in chunk.iterrows():

@@ -119,8 +119,11 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 | Start services             | `docker compose up -d`                                        |
 | Stop services              | `docker compose down`                                         |
 | Reset warehouse data       | `docker compose down -v && docker compose up -d`              |
-| Load CSVs → Postgres       | `python etl/load_postgres.py`                                 |
-| Transform → ClickHouse     | `python etl/load_clickhouse.py`                               |
+| Load CSVs → Postgres       | `python -m etl.load_postgres`                                 |
+| Load OpenAlex publishers   | `python -m etl.load_postgres_publishers`                      |
+| Load SJR factors           | `python -m etl.load_postgres_sjr`                             |
+| Verify Postgres            | `python -m etl.verify`                                        |
+| Transform → ClickHouse     | `python -m etl.load_clickhouse`                               |
 | Open Superset              | http://localhost:8088                                         |
 
 ## Conventions
@@ -137,6 +140,7 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 - ClickHouse does not enforce uniqueness the way Postgres does. Design aggregations accordingly.
 - Large CSV loads: prefer `COPY` (psycopg `copy_expert`) over row-by-row `INSERT`.
 - `data/` and `.env` are gitignored. CSVs come from the original source — do not commit them.
+- Run ETL scripts as modules: `python -m etl.<script>` (not `python etl/<script>.py`). The `etl/` package needs `__init__.py` and `-m` adds the project root to `sys.path` so internal imports resolve.
 
 ## When this file needs updating
 

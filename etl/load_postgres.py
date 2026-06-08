@@ -4,7 +4,10 @@ from pathlib import Path
 from etl.common import get_postgres_cnx, load_env
 from etl.load_gender import load_gender_lookup
 from etl.postgres_helpers import build_lookups
-from etl.sources import load_df1, load_df2, load_dblp, load_pubmed
+from etl.sources.df1 import load_df1
+from etl.sources.df2 import load_df2
+from etl.sources.dblp import load_dblp
+from etl.sources.pubmed import load_pubmed
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
