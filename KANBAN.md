@@ -15,7 +15,7 @@ en el mismo PR que cierra cada task.
 - [x] **TASK-01-006** — Crear `etl/common.py` (env vars, conexión DB, mapeo `fist→first`, normalizador de países)
 - [x] **TASK-01-007** — Implementar `etl/load_postgres.py` (DF1 + DF2 + PubMed + DBLP → Postgres)
 - [x] **TASK-01-008** — Implementar `etl/load_postgres_publishers.py` (OpenAlex `/publishers` + `/sources`)
-- [ ] **TASK-01-009** — Implementar `etl/load_postgres_sjr.py` (Scimago SJR 1999-2025 → `Factor_Impacto`)
+- [x] **TASK-01-009** — Implementar `etl/load_postgres_sjr.py` (Scimago SJR 1999-2025 → `Factor_Impacto`)
 - [ ] **TASK-01-010** — Verificación: queries de conteo, `EXPLAIN`, smoke test de idempotencia
 
 ## EPIC-02 — ETL + ClickHouse (DW analítico)
