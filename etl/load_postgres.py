@@ -1,5 +1,5 @@
 import logging
-from pathlib import Path
+import sys
 
 from etl.common import get_postgres_cnx, load_env
 from etl.postgres_helpers import build_lookups
@@ -11,20 +11,25 @@ log = logging.getLogger(__name__)
 
 AREAS = ["BIO", "CS", "CHEM", "PHYS", "EARTH"]
 
-CS_PAPER_BAD_FIRST_COL = True
-
 
 def main():
+    areas = sys.argv[1:] if len(sys.argv) > 1 else AREAS
+    areas = [a.upper() for a in areas]
+
+    for a in areas:
+        if a not in AREAS:
+            log.error(f"Unknown area '{a}'. Valid: {AREAS}")
+            sys.exit(1)
+
     load_env()
     conn = get_postgres_cnx()
-    log.info("Connected to Postgres")
+    log.info(f"Connected to Postgres. Will process: {areas}")
 
     pais_lookup, categoria_lookup, posicion_lookup, journal_lookup = build_lookups(conn)
 
-    for area in AREAS:
+    for area in areas:
         paper_path = f"data/raw/rawPaper/{area}_paper.csv"
         autor_path = f"data/raw/rawAutor/{area}_autor.csv"
-
         has_bad_col = (area == "CS")
 
         log.info(f"=== Area: {area} ===")
@@ -40,7 +45,7 @@ def main():
 
     conn.commit()
     conn.close()
-    log.info("All sources loaded. Done.")
+    log.info(f"Areas {areas} loaded. Done.")
 
 
 if __name__ == "__main__":
