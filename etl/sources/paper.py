@@ -80,7 +80,7 @@ def load_paper_area(conn, area, paper_path, categoria_lookup, pais_lookup, journ
             if country == "Unknown" or not pais_id:
                 skipped_no_country += 1
 
-            jid = ensure_journal(conn, journal_name, journal_lookup) if journal_name else None
+            jid = ensure_journal(conn, journal_name, journal_lookup)
 
             paper_id = None
             if doi:

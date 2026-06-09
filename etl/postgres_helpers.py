@@ -39,7 +39,7 @@ def build_lookups(conn):
 
 def ensure_journal(conn, journal_name, journal_lookup):
     if not journal_name or not journal_name.strip():
-        return None
+        return _ensure_unknown_journal(conn, journal_lookup)
     key = journal_name.strip().upper()
     if key in journal_lookup:
         return journal_lookup[key]
@@ -53,6 +53,27 @@ def ensure_journal(conn, journal_name, journal_lookup):
             journal_lookup[key] = row[0]
             return row[0]
         cur.execute("SELECT \"Id\" FROM \"Journal\" WHERE \"Nombre\" = %s", (journal_name.strip(),))
+        row = cur.fetchone()
+        if row:
+            journal_lookup[key] = row[0]
+            return row[0]
+    return None
+
+
+def _ensure_unknown_journal(conn, journal_lookup):
+    key = "UNKNOWN"
+    if key in journal_lookup:
+        return journal_lookup[key]
+    with conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO \"Journal\" (\"Nombre\") VALUES ('Unknown') "
+            "ON CONFLICT (\"Nombre\") DO NOTHING RETURNING \"Id\""
+        )
+        row = cur.fetchone()
+        if row:
+            journal_lookup[key] = row[0]
+            return row[0]
+        cur.execute("SELECT \"Id\" FROM \"Journal\" WHERE \"Nombre\" = 'Unknown'")
         row = cur.fetchone()
         if row:
             journal_lookup[key] = row[0]
