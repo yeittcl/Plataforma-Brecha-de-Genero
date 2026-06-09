@@ -38,6 +38,7 @@ def load_paper_area(conn, area, paper_path, categoria_lookup, pais_lookup, journ
     row_count = 0
     skipped_no_category = 0
     skipped_no_country = 0
+    skipped_long_doi = 0
     inserted = 0
 
     for chunk in pd.read_csv(
@@ -61,6 +62,10 @@ def load_paper_area(conn, area, paper_path, categoria_lookup, pais_lookup, journ
             year_str = str(row.get("year", "")).strip() if not pd.isna(row.get("year")) else ""
 
             if not row_id:
+                continue
+
+            if not doi or len(doi) > 200:
+                skipped_long_doi += 1
                 continue
 
             try:
@@ -91,9 +96,11 @@ def load_paper_area(conn, area, paper_path, categoria_lookup, pais_lookup, journ
 
         if row_count % 50_000 == 0:
             log.info(f"  Paper {area}: {row_count} rows, {inserted} papers, "
-                     f"{skipped_no_category} no-category, {skipped_no_country} no-country")
+                     f"{skipped_no_category} no-category, {skipped_no_country} no-country, "
+                     f"{skipped_long_doi} long-doi")
 
     conn.commit()
     log.info(f"  Paper {area} done: {row_count} rows, {inserted} papers inserted, "
-             f"{skipped_no_category} no-category, {skipped_no_country} no-country")
+             f"{skipped_no_category} no-category, {skipped_no_country} no-country, "
+             f"{skipped_long_doi} long-doi")
     return id_to_paper_id
