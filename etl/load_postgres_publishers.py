@@ -2,6 +2,7 @@ import json
 import logging
 import time
 import unicodedata
+from pathlib import Path
 from urllib.parse import quote
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -13,11 +14,30 @@ log = logging.getLogger(__name__)
 
 OPENALEX_API = "https://api.openalex.org"
 API_KEY_MASK = "***"
-MAX_RETRIES = 5
-SLEEP_BETWEEN = 0.01
+CACHE_DIR = Path("data/cache")
+CACHE_FILE = CACHE_DIR / "publishers_search_cache.json"
+MAX_RETRIES = 8
+SLEEP_BETWEEN = 0.02
+CREDIT_WARN_THRESHOLD = 8000
+CREDIT_HARD_LIMIT = 9500
 
 _api_key = ""
 _mailto = ""
+_request_count = 0
+
+
+def _increment_request_count():
+    global _request_count
+    _request_count += 1
+    if _request_count == CREDIT_WARN_THRESHOLD:
+        log.warning(f"Approaching OpenAlex daily credit budget (~{CREDIT_WARN_THRESHOLD} requests)")
+    if _request_count >= CREDIT_HARD_LIMIT:
+        log.error(f"Hit hard credit limit ({CREDIT_HARD_LIMIT} requests). Stopping to preserve budget.")
+        raise CreditLimitExceeded()
+
+
+class CreditLimitExceeded(Exception):
+    pass
 
 
 def fetch_json(url):
@@ -25,11 +45,19 @@ def fetch_json(url):
     for attempt in range(MAX_RETRIES):
         try:
             with urlopen(url, timeout=30) as resp:
+                _increment_request_count()
                 return json.loads(resp.read().decode("utf-8"))
         except HTTPError as e:
             if e.code == 429:
-                wait = (attempt + 1) * 2
-                log.warning(f"Rate limited, sleeping {wait}s...")
+                retry_after = e.headers.get("Retry-After") if hasattr(e, "headers") else None
+                if retry_after:
+                    try:
+                        wait = int(retry_after)
+                    except (ValueError, TypeError):
+                        wait = min(2 ** attempt, 60)
+                else:
+                    wait = min(2 ** attempt, 60)
+                log.warning(f"Rate limited, sleeping {wait}s (attempt {attempt+1}/{MAX_RETRIES})...")
                 time.sleep(wait)
                 continue
             log.error(f"HTTP {e.code} for {safe_url}: {e}")
@@ -37,7 +65,22 @@ def fetch_json(url):
         except Exception as e:
             log.error(f"Error fetching {safe_url}: {e}")
             time.sleep(2)
+    log.error(f"Max retries ({MAX_RETRIES}) exhausted for {safe_url}")
     return None
+
+
+def load_search_cache():
+    if CACHE_FILE.exists():
+        try:
+            return json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+        except Exception as e:
+            log.warning(f"Cache file corrupted, starting fresh: {e}")
+    return {}
+
+
+def save_search_cache(cache):
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    CACHE_FILE.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
 
 
 def search_openalex(query):
@@ -58,50 +101,35 @@ def strip_accents(s):
     return "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn")
 
 
-def find_journal_in_openalex(journal_name):
+def find_journal_in_openalex(journal_name, cache):
+    if journal_name in cache:
+        return cache[journal_name]
+
     name = journal_name.strip()
     if not name:
+        cache[journal_name] = None
         return None
-    candidates = [name]
 
-    for sep in [" (", " - ", " :"]:
-        if sep in name:
-            candidates.append(name.split(sep)[0].strip())
+    primary_results = search_openalex(name)
+    cand_upper = name.upper()
+    for r in primary_results:
+        rname = r.get("display_name", "").strip().upper()
+        if rname == cand_upper:
+            cache[journal_name] = r
+            return r
 
-    no_parens = name.split("(")[0].strip() if "(" in name else None
-    if no_parens and no_parens not in candidates:
-        candidates.append(no_parens)
+    if not primary_results:
+        no_accents = strip_accents(name)
+        if no_accents != name:
+            fallback_results = search_openalex(no_accents)
+            cand_no_acc_upper = no_accents.upper()
+            for r in fallback_results:
+                rname = strip_accents(r.get("display_name", "")).strip().upper()
+                if rname == cand_no_acc_upper:
+                    cache[journal_name] = r
+                    return r
 
-    no_accents = strip_accents(name)
-    if no_accents != name and no_accents not in candidates:
-        candidates.append(no_accents)
-    for c in list(candidates):
-        ca = strip_accents(c)
-        if ca != c and ca not in candidates:
-            candidates.append(ca)
-
-    seen = set()
-    for cand in candidates:
-        if not cand or cand in seen:
-            continue
-        seen.add(cand)
-        try:
-            results = search_openalex(cand)
-        except Exception as e:
-            log.warning(f"Search error for {cand!r}: {e}")
-            continue
-        if not results:
-            continue
-        cand_upper = cand.strip().upper()
-        cand_no_acc = strip_accents(cand).strip().upper()
-        for r in results:
-            rname = r.get("display_name", "").strip().upper()
-            if rname == cand_upper:
-                return r
-        for r in results:
-            rname = strip_accents(r.get("display_name", "")).strip().upper()
-            if rname == cand_no_acc:
-                return r
+    cache[journal_name] = None
     return None
 
 
@@ -159,7 +187,7 @@ def update_journal_editorial(conn, journal_id, editorial_id):
 
 
 def main():
-    global _api_key, _mailto
+    global _api_key, _mailto, _request_count
     env = load_env()
     _api_key = env.get("OPENALEX_API_KEY", "")
     _mailto = env.get("OPENALEX_MAILTO", "")
@@ -167,6 +195,10 @@ def main():
         log.info("OpenAlex API key loaded (using higher rate limit)")
     if _mailto:
         log.info(f"OpenAlex mailto: {_mailto}")
+
+    cache = load_search_cache()
+    if cache:
+        log.info(f"Loaded search cache: {len(cache)} entries")
 
     conn = get_postgres_cnx()
     log.info("Connected to Postgres")
@@ -178,52 +210,76 @@ def main():
         return
 
     total = len(journals_no_ed)
+    cache_hits = sum(1 for jn in journals_no_ed if jn in cache)
+    log.info(f"Cache hits before any API call: {cache_hits}/{total}")
+
     matched = 0
     unmatched = 0
     no_publisher = 0
+    cache_writes = 0
 
-    for i, (journal_name, journal_id) in enumerate(journals_no_ed.items(), 1):
-        source = find_journal_in_openalex(journal_name)
-        if not source:
-            unmatched += 1
-            continue
+    try:
+        for i, (journal_name, journal_id) in enumerate(journals_no_ed.items(), 1):
+            if journal_name in cache and cache[journal_name] is None:
+                unmatched += 1
+                continue
+            if journal_name in cache and cache[journal_name] is not None:
+                source = cache[journal_name]
+            else:
+                source = find_journal_in_openalex(journal_name, cache)
+                cache_writes += 1
+                if cache_writes % 100 == 0:
+                    save_search_cache(cache)
 
-        pub = source.get("host_organization_name")
-        if isinstance(pub, dict):
-            pub_name = pub.get("display_name")
-            pub_id = pub.get("id")
-        elif isinstance(pub, str):
-            pub_name = pub
-            pub_id = None
-        else:
-            no_publisher += 1
-            continue
+            if not source:
+                unmatched += 1
+                continue
 
-        if not pub_name:
-            no_publisher += 1
-            continue
+            pub = source.get("host_organization_name")
+            if isinstance(pub, dict):
+                pub_name = pub.get("display_name")
+                pub_id = pub.get("id")
+            elif isinstance(pub, str):
+                pub_name = pub
+                pub_id = None
+            else:
+                no_publisher += 1
+                continue
 
-        pub_id_str = None
-        if pub_id:
-            pub_id_str = pub_id.split("/")[-1] if "/" in pub_id else pub_id
+            if not pub_name:
+                no_publisher += 1
+                continue
 
-        eid = upsert_editorial(conn, pub_name, pub_id_str)
-        if not eid:
-            no_publisher += 1
-            continue
+            pub_id_str = None
+            if pub_id:
+                pub_id_str = pub_id.split("/")[-1] if "/" in pub_id else pub_id
 
-        if update_journal_editorial(conn, journal_id, eid):
-            matched += 1
+            eid = upsert_editorial(conn, pub_name, pub_id_str)
+            if not eid:
+                no_publisher += 1
+                continue
 
-        if i % 50 == 0:
-            conn.commit()
-            log.info(f"Progress: {i}/{total}, matched={matched}, unmatched={unmatched}, no_publisher={no_publisher}")
+            if update_journal_editorial(conn, journal_id, eid):
+                matched += 1
 
-        time.sleep(SLEEP_BETWEEN)
+            if i % 50 == 0:
+                conn.commit()
+                log.info(f"Progress: {i}/{total}, matched={matched}, unmatched={unmatched}, "
+                         f"no_publisher={no_publisher}, requests={_request_count}, "
+                         f"cache={len(cache)}")
 
-    conn.commit()
-    conn.close()
-    log.info(f"Done. Total: {total}, Matched: {matched}, Unmatched: {unmatched}, No publisher: {no_publisher}")
+            time.sleep(SLEEP_BETWEEN)
+
+    except CreditLimitExceeded:
+        log.error("Aborting due to credit limit. Cache has been saved.")
+    finally:
+        save_search_cache(cache)
+        conn.commit()
+        conn.close()
+
+    log.info(f"Done. Total: {total}, Matched: {matched}, Unmatched: {unmatched}, "
+             f"No publisher: {no_publisher}, API requests used: {_request_count}, "
+             f"Cache entries: {len(cache)}")
 
 
 if __name__ == "__main__":
