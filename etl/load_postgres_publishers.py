@@ -46,7 +46,9 @@ def build_sources_url(cursor=None):
         params.append(f"api_key={_api_key}")
     if _mailto:
         params.append(f"mailto={_mailto}")
-    if cursor:
+    if cursor is None:
+        params.append("cursor=*")
+    elif cursor:
         params.append(f"cursor={cursor}")
     return f"{OPENALEX_API}/sources?{'&'.join(params)}"
 
