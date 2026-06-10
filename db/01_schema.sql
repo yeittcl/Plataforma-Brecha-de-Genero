@@ -39,7 +39,7 @@ CREATE TABLE "Area_Categoria" (
 
 CREATE TABLE "Editorial" (
     "Id"          SERIAL       PRIMARY KEY,
-    "Nombre"      VARCHAR(200) NOT NULL,
+    "Nombre"      VARCHAR(200) NOT NULL UNIQUE,
     "OpenAlex_Id" VARCHAR(100) NULL UNIQUE,
     "Id_Pais"     INT          NULL,
     FOREIGN KEY ("Id_Pais") REFERENCES "Pais"("Id") ON DELETE SET NULL

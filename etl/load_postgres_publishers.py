@@ -115,20 +115,36 @@ def load_journals_no_editorial(conn):
     return mapping
 
 
-def upsert_editorial(conn, nombre, openalex_id):
+def upsert_editorial(conn, nombre, openalex_id=None):
+    if openalex_id:
+        with conn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO "Editorial" ("Nombre", "OpenAlex_Id")
+                   VALUES (%s, %s)
+                   ON CONFLICT ("OpenAlex_Id") DO UPDATE
+                       SET "Nombre" = COALESCE(EXCLUDED."Nombre", "Editorial"."Nombre")
+                   RETURNING "Id" """,
+                (truncate(nombre, 500), openalex_id),
+            )
+            row = cur.fetchone()
+            if row:
+                return row[0]
+            cur.execute('SELECT "Id" FROM "Editorial" WHERE "OpenAlex_Id" = %s', (openalex_id,))
+            row = cur.fetchone()
+            return row[0] if row else None
     with conn.cursor() as cur:
         cur.execute(
-            """INSERT INTO "Editorial" ("Nombre", "OpenAlex_Id")
-               VALUES (%s, %s)
-               ON CONFLICT ("OpenAlex_Id") DO UPDATE
-                   SET "Nombre" = COALESCE(EXCLUDED."Nombre", "Editorial"."Nombre")
+            """INSERT INTO "Editorial" ("Nombre")
+               VALUES (%s)
+               ON CONFLICT ("Nombre") DO UPDATE
+                   SET "Nombre" = EXCLUDED."Nombre"
                RETURNING "Id" """,
-            (truncate(nombre, 500), openalex_id),
+            (truncate(nombre, 500),),
         )
         row = cur.fetchone()
         if row:
             return row[0]
-        cur.execute('SELECT "Id" FROM "Editorial" WHERE "OpenAlex_Id" = %s', (openalex_id,))
+        cur.execute('SELECT "Id" FROM "Editorial" WHERE "Nombre" = %s', (nombre,))
         row = cur.fetchone()
         return row[0] if row else None
 
@@ -172,7 +188,7 @@ def main():
             unmatched += 1
             continue
 
-        pub = source.get("host_organization_name") or source.get("publisher")
+        pub = source.get("host_organization_name")
         if isinstance(pub, dict):
             pub_name = pub.get("display_name")
             pub_id = pub.get("id")
@@ -187,27 +203,11 @@ def main():
             no_publisher += 1
             continue
 
+        pub_id_str = None
         if pub_id:
             pub_id_str = pub_id.split("/")[-1] if "/" in pub_id else pub_id
-        else:
-            pub_id_str = None
 
-        eid = upsert_editorial(conn, pub_name, pub_id_str) if pub_id_str else None
-        if not eid:
-            cur = conn.cursor()
-            cur.execute(
-                """INSERT INTO "Editorial" ("Nombre") VALUES (%s)
-                   ON CONFLICT ("Nombre") DO NOTHING RETURNING "Id" """,
-                (truncate(pub_name, 500),),
-            )
-            row = cur.fetchone()
-            if row:
-                eid = row[0]
-            else:
-                cur.execute('SELECT "Id" FROM "Editorial" WHERE "Nombre" = %s', (pub_name,))
-                row = cur.fetchone()
-                eid = row[0] if row else None
-
+        eid = upsert_editorial(conn, pub_name, pub_id_str)
         if not eid:
             no_publisher += 1
             continue
