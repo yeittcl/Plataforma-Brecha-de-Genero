@@ -20,7 +20,10 @@ def load_env():
     missing = [k for k in required if not os.getenv(k)]
     if missing:
         raise EnvironmentError(f"Missing required env vars: {', '.join(missing)}")
-    return {k: os.getenv(k) for k in required}
+    env = {k: os.getenv(k) for k in required}
+    env["OPENALEX_API_KEY"] = os.getenv("OPENALEX_API_KEY", "")
+    env["OPENALEX_MAILTO"] = os.getenv("OPENALEX_MAILTO", "")
+    return env
 
 
 def get_postgres_cnx():

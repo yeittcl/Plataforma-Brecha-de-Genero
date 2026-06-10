@@ -15,11 +15,13 @@ OPENALEX_API = "https://api.openalex.org"
 CACHE_DIR = Path("data/cache")
 CURSOR_FILE = CACHE_DIR / "openalex_publishers_cursor.txt"
 PER_PAGE = 100
-SLEEP_BETWEEN = 0.12
+SLEEP_BETWEEN = 0.05
 MAX_RETRIES = 5
+API_KEY_MASK = "***"
 
 
 def fetch_json(url):
+    safe_url = url.replace(_api_key, API_KEY_MASK) if _api_key else url
     for attempt in range(MAX_RETRIES):
         try:
             with urlopen(url, timeout=30) as resp:
@@ -30,12 +32,23 @@ def fetch_json(url):
                 log.warning(f"Rate limited, sleeping {wait}s...")
                 time.sleep(wait)
                 continue
-            log.error(f"HTTP {e.code} for {url}: {e}")
+            log.error(f"HTTP {e.code} for {safe_url}: {e}")
             return None
         except Exception as e:
-            log.error(f"Error fetching {url}: {e}")
+            log.error(f"Error fetching {safe_url}: {e}")
             time.sleep(2)
     return None
+
+
+def build_sources_url(cursor=None):
+    params = [f"per_page={PER_PAGE}"]
+    if _api_key:
+        params.append(f"api_key={_api_key}")
+    if _mailto:
+        params.append(f"mailto={_mailto}")
+    if cursor:
+        params.append(f"cursor={cursor}")
+    return f"{OPENALEX_API}/sources?{'&'.join(params)}"
 
 
 def load_cursor():
@@ -86,8 +99,20 @@ def update_journal_editorial(conn, journal_id, editorial_id):
         return cur.rowcount
 
 
+_api_key = ""
+_mailto = ""
+
+
 def main():
-    load_env()
+    global _api_key, _mailto
+    env = load_env()
+    _api_key = env.get("OPENALEX_API_KEY", "")
+    _mailto = env.get("OPENALEX_MAILTO", "")
+    if _api_key:
+        log.info("OpenAlex API key loaded (using higher rate limit)")
+    if _mailto:
+        log.info(f"OpenAlex mailto: {_mailto}")
+
     conn = get_postgres_cnx()
     log.info("Connected to Postgres")
 
@@ -98,9 +123,8 @@ def main():
         return
 
     cursor = load_cursor()
-    url = f"{OPENALEX_API}/sources?per_page={PER_PAGE}"
+    url = build_sources_url(cursor)
     if cursor:
-        url += f"&cursor={cursor}"
         log.info(f"Resuming from cursor: {cursor[:20]}...")
     else:
         log.info("Starting fresh pagination of OpenAlex /sources")
@@ -171,7 +195,7 @@ def main():
             save_cursor(None)
             break
 
-        url = f"{OPENALEX_API}/sources?per_page={PER_PAGE}&cursor={next_cursor}"
+        url = build_sources_url(next_cursor)
         save_cursor(next_cursor)
         time.sleep(SLEEP_BETWEEN)
 
