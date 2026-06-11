@@ -84,11 +84,15 @@ CREATE TABLE IF NOT EXISTS Fact_Paper (
     IdGeo          UInt32,
     IdJournal      UInt32,
     IdArea         UInt16,
+    -- Flags de género (boolean 0/1)
     Mujer_primera  UInt8,
     Mujer_penult   UInt8,
     Mujer_ult      UInt8,
     Hay_mujeres    UInt8,
-    Mujer_Autora   UInt8
+    Mujer_Autora   UInt8,
+    -- Conteos (entero 0-255, suficiente para papers)
+    N_mujeres      UInt8,   -- número de mujeres autoras en el paper
+    N_autores      UInt8    -- número total de autores en el paper
 ) ENGINE = MergeTree()
   PARTITION BY IdTiempo
   ORDER BY (IdTiempo, IdGeo, IdJournal, IdArea, IdPaper);

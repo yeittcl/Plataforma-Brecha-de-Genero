@@ -29,6 +29,8 @@ Esta tabla centraliza las métricas aditivas y booleanas (1 o 0) calculadas a pa
 * `Mujer_ult` (INT): 1 si la última autora (generalmente el Investigador Principal) es mujer, 0 en caso contrario.
 * `Hay_mujeres` (INT): 1 si existe al menos una mujer en cualquier posición de autoría en el paper, 0 en caso contrario.
 * `Mujer_Autora` (INT): 1 si el paper tiene **una única autora y esa autora es mujer**, 0 en cualquier otro caso (autoría múltiple, autoría única masculina, o sin autoras mujeres). Es un indicador de publicaciones unipersonales de mujeres.
+* `N_mujeres` (INT): Cantidad de mujeres autoras en el paper (0-255). Permite distribución: papers con 1 mujer vs 2-3 vs 4+.
+* `N_autores` (INT): Cantidad total de autores en el paper (0-255). Permite distinguir autoría unipersonal (N_autores=1) vs colaborativa (N_autores>1).
 
 ## 4. Dimensiones
 
@@ -140,4 +142,36 @@ JOIN Dim_Journal j ON j.IdJournal = f.IdJournal
 JOIN Dim_FactorImpacto fi ON fi.IdJournal = f.IdJournal AND fi.Año = f.IdTiempo
 WHERE fi.SJR > 1.0
 ORDER BY fi.SJR DESC, fi.Año;
+
+-- Distribución: cuántas mujeres suelen acompañar a una mujer autora
+SELECT
+    N_mujeres,
+    COUNT(*) AS n_papers,
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct
+FROM Fact_Paper
+WHERE Hay_mujeres = 1
+GROUP BY N_mujeres
+ORDER BY N_mujeres;
+
+-- Brecha: unipersonal vs colaborativa
+SELECT
+    CASE WHEN N_autores = 1 THEN 'Unipersonal' ELSE 'Colaborativa' END AS tipo,
+    COUNT(*) AS n_papers,
+    ROUND(100.0 * SUM(Mujer_primera) / COUNT(*), 2) AS pct_mujer_primera,
+    ROUND(100.0 * SUM(Hay_mujeres) / COUNT(*), 2) AS pct_con_mujeres
+FROM Fact_Paper
+GROUP BY tipo;
+
+-- Fluctuación ante eventos importantes (requiere Hito poblado)
+-- Esta query solo retorna datos si la columna Hito fue poblada externamente
+SELECT
+    t.Año,
+    t.Hito,
+    COUNT(*) AS n_papers,
+    ROUND(100.0 * SUM(f.Mujer_primera) / COUNT(*), 2) AS pct_mujer_primera
+FROM Fact_Paper f
+JOIN Dim_Tiempo t ON t.IdTiempo = f.IdTiempo
+WHERE t.Hito IS NOT NULL
+GROUP BY t.Año, t.Hito
+ORDER BY t.Año;
 ```
