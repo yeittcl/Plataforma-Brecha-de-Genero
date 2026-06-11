@@ -126,8 +126,8 @@ def load_dim_factor_impacto(pg, ch) -> int:
     return len(fact_rows)
 
 
-def fetch_fact_batch(pg, journal_lookup: dict, area_lookup: dict,
-                     geo_lookup: dict, tiempo_lookup: dict, offset: int, limit: int) -> list:
+def fetch_fact_batch(pg, area_lookup: dict, tiempo_lookup: dict,
+                     offset: int, limit: int) -> list:
     with pg.cursor() as cur:
         cur.execute("""
             WITH contrib AS (
@@ -174,18 +174,14 @@ def fetch_fact_batch(pg, journal_lookup: dict, area_lookup: dict,
 def load_fact_paper(pg, ch) -> int:
     log.info("Building lookup dicts from dimensions...")
     t0 = time.time()
-    ch_result = ch.query("SELECT IdJournal FROM Dim_Journal").result_rows
-    journal_lookup = {jid: jid for (jid,) in ch_result}
-
+    # Ids in Dim_Journal and Dim_Geografica match Postgres Ids,
+    # so we don't need separate lookups for them.
+    # IdTiempo in Dim_Tiempo is the same as Año (set in load_dim_tiempo),
+    # so the tiempo lookup is just an identity mapping.
     with pg.cursor() as cur:
         cur.execute('SELECT "IdCategoria", "IdArea" FROM "Area_Categoria"')
         area_lookup = dict(cur.fetchall())
-
-    ch_result = ch.query("SELECT IdGeo, IdGeo FROM Dim_Geografica").result_rows
-    geo_lookup = {geo: geo for (geo,) in ch_result}
-
-    ch_result = ch.query("SELECT Año, IdTiempo FROM Dim_Tiempo").result_rows
-    tiempo_lookup = {int(year): int(tid) for year, tid in ch_result}
+    tiempo_lookup = {y: y for y in range(1999, 2026)}
     log.info(f"  Lookups built in {time.time() - t0:.1f}s")
 
     with pg.cursor() as cur:
@@ -204,8 +200,7 @@ def load_fact_paper(pg, ch) -> int:
     inserted = 0
     offset = 0
     while offset < total_papers:
-        rows = fetch_fact_batch(pg, journal_lookup, area_lookup, geo_lookup, tiempo_lookup,
-                                offset, BATCH_SIZE)
+        rows = fetch_fact_batch(pg, area_lookup, tiempo_lookup, offset, BATCH_SIZE)
         if not rows:
             break
 
@@ -213,10 +208,11 @@ def load_fact_paper(pg, ch) -> int:
         for r in rows:
             paper_id, year, pais_id, jid, cat_id, m1, m2, m3, hm, ma, nm, na = r
             id_tiempo = tiempo_lookup.get(int(year))
-            id_geo = geo_lookup.get(int(pais_id))
+            # IdGeo in ClickHouse = Id_Pais in Postgres (same IDs)
+            id_geo = int(pais_id)
             id_journal = int(jid)
             id_area = area_lookup.get(int(cat_id))
-            if id_tiempo is None or id_geo is None or id_area is None:
+            if id_tiempo is None or id_area is None:
                 continue
             ch_rows.append((
                 int(paper_id), int(id_tiempo), int(id_geo), int(id_journal), int(id_area),
