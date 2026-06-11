@@ -57,6 +57,7 @@ CREATE TABLE "Factor_Impacto" (
     "Año"        INT    NOT NULL,
     "Valor"      FLOAT  NOT NULL,
     "Id_Journal" INT    NOT NULL,
+    UNIQUE ("Id_Journal", "Año"),
     FOREIGN KEY ("Id_Journal") REFERENCES "Journal"("Id") ON DELETE CASCADE
 );
 
