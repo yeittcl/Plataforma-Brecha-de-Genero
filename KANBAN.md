@@ -5,7 +5,7 @@ en el mismo PR que cierra cada task.
 
 ## EPIC-01 — ETL + Postgres (OLTP, fuente de verdad)
 
-**Status**: pending
+**Status**: done (released as v0.1.0)
 
 - [x] **TASK-01-001** — Crear estructura de carpetas y mover CSVs ganadores a `data/raw/` y SJR a `data/external/sjr/`
 - [x] **TASK-01-002** — Crear `db/01_schema.sql` con DDL de las 12 tablas + constraints
@@ -20,9 +20,9 @@ en el mismo PR que cierra cada task.
 
 ## EPIC-02 — ETL + ClickHouse (DW analítico)
 
-**Status**: pending
+**Status**: in-progress
 
-- [ ] **TASK-02-001** — Crear DDL de ClickHouse (`db/clickhouse_schema.sql`)
+- [~] **TASK-02-001** — Crear DDL de ClickHouse (`db/clickhouse_schema.sql`)
 - [ ] **TASK-02-002** — Implementar `etl/load_clickhouse.py` (Postgres → ClickHouse)
 - [ ] **TASK-02-003** — Verificación: counts, sample queries OLAP
 
