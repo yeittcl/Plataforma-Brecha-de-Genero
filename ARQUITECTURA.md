@@ -34,8 +34,7 @@ redundancia entre tablas de "auditoría" y tablas de "trabajo".
 **Editorial**
 
 * `Id` (PK, INT): Identificador único de la editorial.
-* `Nombre` (VARCHAR): Nombre de la editorial.
-* `OpenAlex_Id` (VARCHAR, UNIQUE NULL): ID de la editorial en OpenAlex.
+* `Nombre` (VARCHAR, UNIQUE): Nombre de la editorial (deduplicación por nombre).
 * `Id_Pais` (FK, INT NULL): País de origen de la editorial (referencia al mismo
   catálogo que `Pais`, evita duplicación).
 
@@ -43,7 +42,6 @@ redundancia entre tablas de "auditoría" y tablas de "trabajo".
 
 * `Id` (PK, INT): Identificador único de la revista.
 * `Nombre` (VARCHAR): Nombre de la revista.
-* `ISSN` (VARCHAR NULL): ISSN cuando esté disponible.
 * `Id_Editorial` (FK, INT NULL): Editorial a la que pertenece (1..n).
 
 **Factor_Impacto**

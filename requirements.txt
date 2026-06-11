@@ -1,0 +1,6 @@
+pandas>=2.2,<3
+psycopg[binary]>=3.1,<4
+clickhouse-connect>=0.7,<1
+python-dotenv>=1.0,<2
+tqdm>=4.66,<5
+python-dateutil>=2.9,<3
