@@ -143,23 +143,7 @@ def load_journals_no_editorial(conn):
     return mapping
 
 
-def upsert_editorial(conn, nombre, openalex_id=None):
-    if openalex_id:
-        with conn.cursor() as cur:
-            cur.execute(
-                """INSERT INTO "Editorial" ("Nombre", "OpenAlex_Id")
-                   VALUES (%s, %s)
-                   ON CONFLICT ("OpenAlex_Id") DO UPDATE
-                       SET "Nombre" = COALESCE(EXCLUDED."Nombre", "Editorial"."Nombre")
-                   RETURNING "Id" """,
-                (truncate(nombre, 500), openalex_id),
-            )
-            row = cur.fetchone()
-            if row:
-                return row[0]
-            cur.execute('SELECT "Id" FROM "Editorial" WHERE "OpenAlex_Id" = %s', (openalex_id,))
-            row = cur.fetchone()
-            return row[0] if row else None
+def upsert_editorial(conn, nombre):
     with conn.cursor() as cur:
         cur.execute(
             """INSERT INTO "Editorial" ("Nombre")
@@ -238,10 +222,8 @@ def main():
             pub = source.get("host_organization_name")
             if isinstance(pub, dict):
                 pub_name = pub.get("display_name")
-                pub_id = pub.get("id")
             elif isinstance(pub, str):
                 pub_name = pub
-                pub_id = None
             else:
                 no_publisher += 1
                 continue
@@ -250,11 +232,7 @@ def main():
                 no_publisher += 1
                 continue
 
-            pub_id_str = None
-            if pub_id:
-                pub_id_str = pub_id.split("/")[-1] if "/" in pub_id else pub_id
-
-            eid = upsert_editorial(conn, pub_name, pub_id_str)
+            eid = upsert_editorial(conn, pub_name)
             if not eid:
                 no_publisher += 1
                 continue

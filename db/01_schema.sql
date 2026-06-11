@@ -40,7 +40,6 @@ CREATE TABLE "Area_Categoria" (
 CREATE TABLE "Editorial" (
     "Id"          SERIAL       PRIMARY KEY,
     "Nombre"      VARCHAR(200) NOT NULL UNIQUE,
-    "OpenAlex_Id" VARCHAR(100) NULL UNIQUE,
     "Id_Pais"     INT          NULL,
     FOREIGN KEY ("Id_Pais") REFERENCES "Pais"("Id") ON DELETE SET NULL
 );
@@ -48,7 +47,6 @@ CREATE TABLE "Editorial" (
 CREATE TABLE "Journal" (
     "Id"           SERIAL       PRIMARY KEY,
     "Nombre"       VARCHAR(300) NOT NULL,
-    "ISSN"         VARCHAR(20)  NULL,
     "Id_Editorial" INT          NULL,
     UNIQUE ("Nombre"),
     FOREIGN KEY ("Id_Editorial") REFERENCES "Editorial"("Id") ON DELETE SET NULL
