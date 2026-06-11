@@ -174,25 +174,18 @@ def fetch_fact_batch(pg, journal_lookup: dict, area_lookup: dict,
 def load_fact_paper(pg, ch) -> int:
     log.info("Building lookup dicts from dimensions...")
     t0 = time.time()
-    journal_lookup = {}
     ch_result = ch.query("SELECT IdJournal FROM Dim_Journal").result_rows
-    for (jid,) in ch_result:
-        journal_lookup[jid] = jid
-    area_lookup = {}
-    ch_result = ch.query("""
-        SELECT ac."IdCategoria", ac."IdArea"
-        FROM "Area_Categoria" ac
-    """, database='memoria').result_rows
-    for cat_id, area_id in ch_result:
-        area_lookup[cat_id] = area_id
-    geo_lookup = {}
+    journal_lookup = {jid: jid for (jid,) in ch_result}
+
+    with pg.cursor() as cur:
+        cur.execute('SELECT "IdCategoria", "IdArea" FROM "Area_Categoria"')
+        area_lookup = dict(cur.fetchall())
+
     ch_result = ch.query("SELECT IdGeo, IdGeo FROM Dim_Geografica").result_rows
-    for (geo,) in ch_result:
-        geo_lookup[geo] = geo
-    tiempo_lookup = {}
+    geo_lookup = {geo: geo for (geo,) in ch_result}
+
     ch_result = ch.query("SELECT Año, IdTiempo FROM Dim_Tiempo").result_rows
-    for year, tid in ch_result:
-        tiempo_lookup[year] = tid
+    tiempo_lookup = {int(year): int(tid) for year, tid in ch_result}
     log.info(f"  Lookups built in {time.time() - t0:.1f}s")
 
     with pg.cursor() as cur:
