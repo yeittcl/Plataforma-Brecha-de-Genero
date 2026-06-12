@@ -1,0 +1,289 @@
+table_name: Fact_Paper
+main_dttm_col: null
+description: 'Fact Paper: 1 fila por paper, con flags de genero'
+default_endpoint: null
+offset: 0
+cache_timeout: null
+schema: memoria
+sql: null
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+metrics:
+- metric_name: pct_unipersonal
+  verbose_name: null
+  metric_type: number
+  expression: SUM(IF(N_autores = 1, 1, 0)) * 100.0 / COUNT(*)
+  description: 'Virtual metric: pct_unipersonal'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: pct_unipersonal_mujer
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_Autora) * 100.0 / COUNT(*)
+  description: 'Virtual metric: pct_unipersonal_mujer'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: pct_con_mujeres
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Hay_mujeres) * 100.0 / COUNT(*)
+  description: 'Virtual metric: pct_con_mujeres'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: pct_mujer_primera
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_primera) * 100.0 / COUNT(*)
+  description: 'Virtual metric: pct_mujer_primera'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: pct_mujer_penult
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_penult) * 100.0 / COUNT(*)
+  description: 'Virtual metric: pct_mujer_penult'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: pct_mujer_ult
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_ult) * 100.0 / COUNT(*)
+  description: 'Virtual metric: pct_mujer_ult'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: count
+  verbose_name: null
+  metric_type: number
+  expression: COUNT(*)
+  description: 'Virtual metric: count'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: avg_n_autores
+  verbose_name: null
+  metric_type: number
+  expression: AVG(N_autores)
+  description: 'Virtual metric: avg_n_autores'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: avg_n_mujeres
+  verbose_name: null
+  metric_type: number
+  expression: AVG(N_mujeres)
+  description: 'Virtual metric: avg_n_mujeres'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: n_unipersonal_mujer
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_Autora)
+  description: 'Virtual metric: n_unipersonal_mujer'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: n_con_mujeres
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Hay_mujeres)
+  description: 'Virtual metric: n_con_mujeres'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: n_mujer_primera
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_primera)
+  description: 'Virtual metric: n_mujer_primera'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: n_mujer_penult
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_penult)
+  description: 'Virtual metric: n_mujer_penult'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+- metric_name: n_mujer_ult
+  verbose_name: null
+  metric_type: number
+  expression: SUM(Mujer_ult)
+  description: 'Virtual metric: n_mujer_ult'
+  d3format: null
+  currency: null
+  extra: null
+  warning_text: null
+columns:
+- column_name: IdArea
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: false
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: Mujer_Autora
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: TINYINT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: IdPaper
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: BIGINT
+  advanced_data_type: null
+  groupby: false
+  filterable: false
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: IdGeo
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: false
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: IdJournal
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: false
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: IdTiempo
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
+  advanced_data_type: null
+  groupby: false
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: Hay_mujeres
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: TINYINT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: Mujer_primera
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: TINYINT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: Mujer_penult
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: TINYINT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: Mujer_ult
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: TINYINT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: N_autores
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: TINYINT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: N_mujeres
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: TINYINT
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+version: 1.0.0
+database_uuid: 0d3cf388-3c26-4319-83a3-f0e2b921bd90

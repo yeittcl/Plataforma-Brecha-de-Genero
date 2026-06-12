@@ -127,6 +127,9 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 | Transform → ClickHouse     | `python -m etl.load_clickhouse`                               |
 | Open public landing        | http://localhost:8080                                         |
 | Open Superset (admin)      | http://localhost:8088                                         |
+| Re-create Superset datasets| `docker compose run --rm superset python3 /app/cfg/init_datasets.py` (idempotent) |
+| Export datasets to YAML    | `docker compose run --rm superset python3 /app/cfg/export_datasets.py`           |
+| Import datasets from YAML  | `docker compose run --rm superset python3 /app/cfg/import_datasets.py` (idempotent) |
 
 ## Conventions
 
@@ -148,6 +151,12 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 - **Superset Python scripts that need an app context** (e.g. `init_db.py`): `from superset.app import create_app` triggers `superset/__init__.py` which evaluates `app: Flask = current_app` at module import time. To avoid `RuntimeError: Working outside of application context`, load the script via `importlib.util.spec_from_file_location` (NOT plain `import` or `python script.py`), and import models **inside** `app.app_context()`. See `superset/config/init_db.py` for the working pattern.
 - **`superset shell` heredoc** in bash strips leading whitespace — do not use Python `if/else` with indented blocks inside `<<PYEOF`. Prefer `importlib` + a real Python file.
 - **Superset `set-role` CLI does not exist** in 3.x. Use `PUBLIC_ROLE_LIKE = "Gamma"` in `superset_config.py` so the `Public` role automatically inherits Gamma's read-only permissions.
+- **`clickhouse-sqlalchemy` 0.3.x is incompatible with Superset 3.1.3 + SQLAlchemy 1.4.x** (raises `cannot import name '_BindParamClause' from 'sqlalchemy.sql.expression'`). Pin to `==0.2.7` in `superset/requirements-local.txt`.
+- **Bind-mount of bash scripts from Windows adds `\r` (CRLF)**, breaking the shebang (`#!/bin/bash\r` not found). Workaround for the init container: `command: ["sh", "-c", "tr -d '\\r' < /app/init_admin.sh > /tmp/init.sh && bash /tmp/init.sh"]`.
+- **Superset dataset `table_name` is the physical table name** in the DB, not an arbitrary display label. If you want a `ds_` prefix for organization, set it in `description` instead of `table_name`. Lowercased physical names are also tried: e.g. `Dim_Geografica` → Superset queries `memoria.Dim_Geografica` (case-sensitive in ClickHouse).
+- **ClickHouse SQL: prefer `IF(cond, a, b)` over `CASE WHEN`** for virtual metrics. `CASE WHEN` works in raw queries but some Superset-injected wrappers choke on it.
+- **Superset `import-datasources` CLI expects a single ZIP** with a specific schema (`version` + `databases` keys, with each database listing datasources by relative YAML path). It does NOT accept a directory of YAMLs. For round-trip we use a Python script (`superset/config/import_datasets.py`) that iterates YAMLs and inserts via ORM. The CANONICAL way to (re)create datasets is `init_datasets.py`; YAMLs are an exportable backup only.
+- **Superset 3.1.3 supports at most 8 levels of `else:` nesting in `bash` heredocs before choking** with cryptic `SyntaxError`. Avoid complex conditionals inside `superset shell <<PYEOF` — keep the logic in a real Python file and call it with `importlib.util.spec_from_file_location` (see `init_db.py`).
 
 ## When this file needs updating
 

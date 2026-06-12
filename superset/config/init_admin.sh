@@ -32,6 +32,6 @@ superset fab create-admin \
 echo "[init] Public role mirrors Gamma via PUBLIC_ROLE_LIKE config (no action needed)"
 
 echo "[init] Importing database connection for ClickHouse..."
-python3 -c "import importlib.util; spec = importlib.util.spec_from_file_location('init_db', '/app/init_db.py'); mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); mod.main()"
+python3 -c "import importlib.util; spec = importlib.util.spec_from_file_location('init_db', '/app/cfg/init_db.py'); mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); mod.main()"
 
 echo "[init] Done."

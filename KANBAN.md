@@ -31,11 +31,10 @@ en el mismo PR que cierra cada task.
 **Status**: in-progress
 
 - [x] **TASK-03-001** — `docker-compose.yml` con Superset + Nginx (landing en :8080, Superset en :8088)
-- [ ] **TASK-03-002** — Conexión ClickHouse en Superset
-- [ ] **TASK-03-003** — Datasets y dimensiones
-- [ ] **TASK-03-004** — Dashboards
-- [ ] **TASK-03-005** — Landing page + i18n español
-- [ ] **TASK-03-006** — Verificación + cierre EPIC-03 (README)
+- [x] **TASK-03-002** — Datasets: 6 datasets (5 dims + Fact_Paper) + 14 métricas virtuales en `Fact_Paper`. Round-trip YAML probado. Idempotente via `init_datasets.py`.
+- [ ] **TASK-03-003** — Dashboards (manuales via UI, 6 dashboards temáticos)
+- [ ] **TASK-03-004** — Landing page + i18n español
+- [ ] **TASK-03-005** — Verificación + cierre EPIC-03 (README)
 
 ## Leyenda
 - `[ ]` pending

@@ -65,8 +65,7 @@ services:
     volumes:
       - superset_data:/app/superset_home
       - ./superset/config/superset_config.py:/app/pythonpath/superset_config.py:ro
-      - ./superset/config/init_admin.sh:/app/init_admin.sh:ro
-      - ./superset/config/init_db.py:/app/init_db.py:ro
+      - ./superset/config:/app/cfg:ro
     depends_on:
       clickhouse:
         condition: service_healthy
@@ -82,7 +81,7 @@ services:
       context: ./superset
       dockerfile: Dockerfile
     container_name: memoria-superset-init
-    command: ["/app/init_admin.sh"]
+    command: ["sh", "-c", "tr -d '\\r' < /app/cfg/init_admin.sh > /tmp/init.sh && bash /tmp/init.sh"]
     environment:
       SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
       SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME}
@@ -96,8 +95,7 @@ services:
     volumes:
       - superset_data:/app/superset_home
       - ./superset/config/superset_config.py:/app/pythonpath/superset_config.py:ro
-      - ./superset/config/init_admin.sh:/app/init_admin.sh:ro
-      - ./superset/config/init_db.py:/app/init_db.py:ro
+      - ./superset/config:/app/cfg:ro
     depends_on:
       superset:
         condition: service_healthy

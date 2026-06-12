@@ -1,1 +1,2 @@
 clickhouse-connect>=0.7,<1
+clickhouse-sqlalchemy==0.2.7
