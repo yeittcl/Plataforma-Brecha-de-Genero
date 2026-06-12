@@ -3,7 +3,7 @@ slug: tendencia-temporal
 description: Evolucion de la brecha a lo largo del tiempo
 css: ''
 position_json: '{}'
-json_metadata: '{"CHART-KEY":"val"}'
+json_metadata: '{}'
 published: false
 version: 1.0.0
 charts:
@@ -12,27 +12,31 @@ charts:
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metrics": ["pct_mujer_primera", "pct_mujer_ult"], "groupby": "IdTiempo",
-    "show_legend": true, "y_axis_format": ".1f"}'
+  params: '{"metrics": [{"label": "pct_mujer_primera"}, {"label": "pct_mujer_ult"}],
+    "groupby": ["IdTiempo"], "show_legend": true, "y_axis_format": ".1f", "x_axis":
+    "IdTiempo", "line_interpolation": "linear"}'
   description: '% Mujer Primera vs Ultima por Anio'
 - slice_name: Papers por Anio
   viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": "IdTiempo", "y_axis_format": ",d"}'
+  params: '{"metrics": [{"label": "count"}], "groupby": ["IdTiempo"], "y_axis_format":
+    ",d"}'
   description: Papers por Anio
 - slice_name: Promedio Autores por Anio
   viz_type: line
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "avg_n_autores", "groupby": "IdTiempo", "y_axis_format": ".2f"}'
+  params: '{"metrics": [{"label": "avg_n_autores"}], "groupby": ["IdTiempo"], "y_axis_format":
+    ".2f", "x_axis": "IdTiempo"}'
   description: Promedio Autores por Anio
 - slice_name: '% Unipersonal por Anio'
   viz_type: line
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_unipersonal", "groupby": "IdTiempo", "y_axis_format": ".1f"}'
+  params: '{"metrics": [{"label": "pct_unipersonal"}], "groupby": ["IdTiempo"], "y_axis_format":
+    ".1f", "x_axis": "IdTiempo"}'
   description: '% Unipersonal por Anio'

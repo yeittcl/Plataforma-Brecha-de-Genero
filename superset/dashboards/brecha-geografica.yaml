@@ -3,7 +3,7 @@ slug: brecha-geografica
 description: Distribucion por paises y regiones
 css: ''
 position_json: '{}'
-json_metadata: '{"CHART-KEY":"val"}'
+json_metadata: '{}'
 published: false
 version: 1.0.0
 charts:
@@ -12,27 +12,22 @@ charts:
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_mujer_ult", "groupby": "IdGeo", "y_axis_format": ".1f"}'
+  params: '{"metrics": [{"label": "pct_mujer_ult"}], "groupby": ["IdGeo"], "y_axis_format":
+    ".1f", "row_limit": 30}'
   description: '% Mujer Ultima por Region'
 - slice_name: Top 20 Paises por Papers
   viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": "IdGeo", "row_limit": 20, "y_axis_format":
-    ",d"}'
+  params: '{"metrics": [{"label": "count"}], "groupby": ["IdGeo"], "row_limit": 20,
+    "y_axis_format": ",d"}'
   description: Top 20 Paises por Papers
 - slice_name: '% Mujer Primera por Region'
   viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_mujer_primera", "groupby": "IdGeo", "y_axis_format": ".1f"}'
+  params: '{"metrics": [{"label": "pct_mujer_primera"}], "groupby": ["IdGeo"], "y_axis_format":
+    ".1f", "row_limit": 30}'
   description: '% Mujer Primera por Region'
-- slice_name: Papers por Region (pivot)
-  viz_type: pivot_table
-  datasource_id: 6
-  datasource_type: table
-  datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": ["IdGeo"], "y_axis_format": ",d"}'
-  description: Papers por Region (pivot)

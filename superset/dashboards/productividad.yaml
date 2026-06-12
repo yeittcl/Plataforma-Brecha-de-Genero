@@ -3,7 +3,7 @@ slug: productividad
 description: Distribucion de autoria y colaboracion
 css: ''
 position_json: '{}'
-json_metadata: '{"CHART-KEY":"val"}'
+json_metadata: '{}'
 published: false
 version: 1.0.0
 charts:
@@ -12,26 +12,22 @@ charts:
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": "N_autores", "y_axis_format": ",d"}'
+  params: '{"metrics": [{"label": "count"}], "groupby": ["N_autores"], "y_axis_format":
+    ",d"}'
   description: Distribucion N Autores
 - slice_name: Distribucion N Mujeres
   viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": "N_mujeres", "y_axis_format": ",d"}'
+  params: '{"metrics": [{"label": "count"}], "groupby": ["N_mujeres"], "y_axis_format":
+    ",d"}'
   description: Distribucion N Mujeres
-- slice_name: '% Unipersonal vs Colaborativa'
-  viz_type: pie
+- slice_name: '% Mujer Primera vs N Autores'
+  viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": ["N_autores"]}'
-  description: '% Unipersonal vs Colaborativa'
-- slice_name: '% Mujer Primera: Unipersonal vs Colaborativa'
-  viz_type: pie
-  datasource_id: 6
-  datasource_type: table
-  datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_mujer_primera", "groupby": ["N_autores"]}'
-  description: '% Mujer Primera: Unipersonal vs Colaborativa'
+  params: '{"metrics": [{"label": "pct_mujer_primera"}], "groupby": ["N_autores"],
+    "y_axis_format": ".1f"}'
+  description: '% Mujer Primera vs N Autores'

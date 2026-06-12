@@ -1,10 +1,13 @@
-"""Idempotent: create 6 dashboards + 25+ charts for the Memoria BI.
+"""Idempotent: create 6 dashboards + 24 charts for the Memoria BI.
 
 Each chart has:
   - viz_type: pie / big_number / bar / line / pivot_table / etc.
   - datasource: dataset name (must exist in Superset)
-  - params: the viz config (groupby, metrics, etc.)
-  - form_data: same as params (used in chart query)
+  - params: the viz config in Superset format
+    - metric (single): {"label": "count"} references dataset's virtual metric
+    - metrics (list): [{"label": "count"}, {"label": "pct_mujer_ult"}]
+    - Or SQL: {"label": "X", "expressionType": "SQL", "sqlExpression": "..."}
+  - groupby: column name (string) or list of column names
 
 Charts reference the dataset by ID. We use the SqlaTable ORM.
 
@@ -14,6 +17,16 @@ Run via:
 import os
 
 os.environ.setdefault("SUPERSET_CONFIG_PATH", "/app/pythonpath/superset_config.py")
+
+
+def M(label):
+    """Make a metric dict referencing a dataset virtual metric by label."""
+    return {"label": label}
+
+
+def SQL(label, expr):
+    """Make an inline SQL metric."""
+    return {"label": label, "expressionType": "SQL", "sqlExpression": expr}
 
 
 DASHBOARDS = [
@@ -27,8 +40,7 @@ DASHBOARDS = [
                 "viz_type": "big_number_total",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "show_trend_line": False,
+                    "metric": M("count"),
                     "y_axis_format": ",d",
                 },
             },
@@ -37,9 +49,8 @@ DASHBOARDS = [
                 "viz_type": "big_number_total",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_mujer_primera",
+                    "metric": M("pct_mujer_primera"),
                     "y_axis_format": ".2f",
-                    "header_font_size": 0.3,
                 },
             },
             {
@@ -47,7 +58,7 @@ DASHBOARDS = [
                 "viz_type": "big_number_total",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_mujer_ult",
+                    "metric": M("pct_mujer_ult"),
                     "y_axis_format": ".2f",
                 },
             },
@@ -56,9 +67,8 @@ DASHBOARDS = [
                 "viz_type": "treemap",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
+                    "metric": M("count"),
                     "groupby": ["IdArea"],
-                    "custom_label": "papers",
                 },
             },
         ],
@@ -73,10 +83,12 @@ DASHBOARDS = [
                 "viz_type": "dist_bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metrics": ["pct_mujer_primera", "pct_mujer_ult"],
-                    "groupby": "IdArea",
+                    "metrics": [M("pct_mujer_primera"), M("pct_mujer_ult")],
+                    "groupby": ["IdArea"],
                     "show_legend": True,
                     "y_axis_format": ".1f",
+                    "groupby_type": "dimension",
+                    "show_total": False,
                 },
             },
             {
@@ -84,9 +96,10 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "groupby": "IdArea",
+                    "metrics": [M("count")],
+                    "groupby": ["IdArea"],
                     "y_axis_format": ",d",
+                    "row_limit": 30,
                 },
             },
             {
@@ -94,19 +107,21 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_con_mujeres",
-                    "groupby": "IdArea",
+                    "metrics": [M("pct_con_mujeres")],
+                    "groupby": ["IdArea"],
                     "y_axis_format": ".1f",
+                    "row_limit": 30,
                 },
             },
             {
-                "name": "Brecha Primera - Ultima por Area",
+                "name": "% Unipersonal por Area",
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_mujer_primera",
-                    "groupby": "IdArea",
+                    "metrics": [M("pct_unipersonal")],
+                    "groupby": ["IdArea"],
                     "y_axis_format": ".1f",
+                    "row_limit": 30,
                 },
             },
         ],
@@ -121,10 +136,12 @@ DASHBOARDS = [
                 "viz_type": "line",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metrics": ["pct_mujer_primera", "pct_mujer_ult"],
-                    "groupby": "IdTiempo",
+                    "metrics": [M("pct_mujer_primera"), M("pct_mujer_ult")],
+                    "groupby": ["IdTiempo"],
                     "show_legend": True,
                     "y_axis_format": ".1f",
+                    "x_axis": "IdTiempo",
+                    "line_interpolation": "linear",
                 },
             },
             {
@@ -132,8 +149,8 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "groupby": "IdTiempo",
+                    "metrics": [M("count")],
+                    "groupby": ["IdTiempo"],
                     "y_axis_format": ",d",
                 },
             },
@@ -142,9 +159,10 @@ DASHBOARDS = [
                 "viz_type": "line",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "avg_n_autores",
-                    "groupby": "IdTiempo",
+                    "metrics": [M("avg_n_autores")],
+                    "groupby": ["IdTiempo"],
                     "y_axis_format": ".2f",
+                    "x_axis": "IdTiempo",
                 },
             },
             {
@@ -152,9 +170,10 @@ DASHBOARDS = [
                 "viz_type": "line",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_unipersonal",
-                    "groupby": "IdTiempo",
+                    "metrics": [M("pct_unipersonal")],
+                    "groupby": ["IdTiempo"],
                     "y_axis_format": ".1f",
+                    "x_axis": "IdTiempo",
                 },
             },
         ],
@@ -169,9 +188,10 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_mujer_ult",
-                    "groupby": "IdGeo",
+                    "metrics": [M("pct_mujer_ult")],
+                    "groupby": ["IdGeo"],
                     "y_axis_format": ".1f",
+                    "row_limit": 30,
                 },
             },
             {
@@ -179,8 +199,8 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "groupby": "IdGeo",
+                    "metrics": [M("count")],
+                    "groupby": ["IdGeo"],
                     "row_limit": 20,
                     "y_axis_format": ",d",
                 },
@@ -190,19 +210,10 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_mujer_primera",
-                    "groupby": "IdGeo",
-                    "y_axis_format": ".1f",
-                },
-            },
-            {
-                "name": "Papers por Region (pivot)",
-                "viz_type": "pivot_table",
-                "dataset": "Fact_Paper",
-                "params": {
-                    "metric": "count",
+                    "metrics": [M("pct_mujer_primera")],
                     "groupby": ["IdGeo"],
-                    "y_axis_format": ",d",
+                    "y_axis_format": ".1f",
+                    "row_limit": 30,
                 },
             },
         ],
@@ -217,8 +228,8 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "groupby": "N_autores",
+                    "metrics": [M("count")],
+                    "groupby": ["N_autores"],
                     "y_axis_format": ",d",
                 },
             },
@@ -227,27 +238,19 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "groupby": "N_mujeres",
+                    "metrics": [M("count")],
+                    "groupby": ["N_mujeres"],
                     "y_axis_format": ",d",
                 },
             },
             {
-                "name": "% Unipersonal vs Colaborativa",
-                "viz_type": "pie",
+                "name": "% Mujer Primera vs N Autores",
+                "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
+                    "metrics": [M("pct_mujer_primera")],
                     "groupby": ["N_autores"],
-                },
-            },
-            {
-                "name": "% Mujer Primera: Unipersonal vs Colaborativa",
-                "viz_type": "pie",
-                "dataset": "Fact_Paper",
-                "params": {
-                    "metric": "pct_mujer_primera",
-                    "groupby": ["N_autores"],
+                    "y_axis_format": ".1f",
                 },
             },
         ],
@@ -262,8 +265,8 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "groupby": "IdJournal",
+                    "metrics": [M("count")],
+                    "groupby": ["IdJournal"],
                     "row_limit": 20,
                     "y_axis_format": ",d",
                 },
@@ -273,20 +276,29 @@ DASHBOARDS = [
                 "viz_type": "bar",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "pct_mujer_ult",
-                    "groupby": "IdJournal",
+                    "metrics": [M("pct_mujer_ult")],
+                    "groupby": ["IdJournal"],
                     "row_limit": 20,
                     "y_axis_format": ".1f",
                 },
             },
+        ],
+    },
+    {
+        "slug": "mapa-geografico",
+        "title": "07 - Mapa Geografico",
+        "description": "Distribucion de papers por pais en el mundo",
+        "charts": [
             {
-                "name": "Papers por Anio con SJR (pivot)",
-                "viz_type": "pivot_table_v2",
+                "name": "Papers por Pais (mapa mundial)",
+                "viz_type": "world_map",
                 "dataset": "Fact_Paper",
                 "params": {
-                    "metric": "count",
-                    "groupby": ["IdJournal", "IdTiempo"],
-                    "row_limit": 50,
+                    "metric": M("count"),
+                    "entity": "country_name",
+                    "country_fieldtype": "cca2",
+                    "groupby": ["NombrePais"],
+                    "viz_type": "world_map",
                 },
             },
         ],
@@ -305,8 +317,8 @@ def main():
         from flask_appbuilder.security.sqla.models import User, Role
 
         datasets_by_name = {ds.table_name: ds for ds in db.session.query(SqlaTable).all()}
-        if len(datasets_by_name) != 6:
-            print(f"[dashboards] WARNING: expected 6 datasets, found {len(datasets_by_name)}")
+        if len(datasets_by_name) < 6:
+            print(f"[dashboards] WARNING: expected 6+ datasets, found {len(datasets_by_name)}")
 
         admin = db.session.query(User).filter_by(username="admin").one()
         public_role = db.session.query(Role).filter_by(name="Public").one()
@@ -329,17 +341,17 @@ def main():
             )
             dash.roles = [public_role]
             dash.css = ""
-            dash.json_metadata = '{"CHART-KEY":"val"}'
+            dash.json_metadata = "{}"
             db.session.add(dash)
             db.session.flush()
 
-            for i, chart_def in enumerate(dash_def["charts"]):
+            import json
+            for chart_def in dash_def["charts"]:
                 ds = datasets_by_name.get(chart_def["dataset"])
                 if not ds:
                     print(f"  [WARN] dataset {chart_def['dataset']} not found, skipping {chart_def['name']}")
                     continue
 
-                import json
                 slice_obj = Slice(
                     slice_name=chart_def["name"],
                     viz_type=chart_def["viz_type"],

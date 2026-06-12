@@ -3,7 +3,7 @@ slug: resumen-general
 description: KPIs principales y distribucion global
 css: ''
 position_json: '{}'
-json_metadata: '{"CHART-KEY":"val"}'
+json_metadata: '{}'
 published: false
 version: 1.0.0
 charts:
@@ -12,27 +12,26 @@ charts:
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "show_trend_line": false, "y_axis_format": ",d"}'
+  params: '{"metric": {"label": "count"}, "y_axis_format": ",d"}'
   description: Total de papers
 - slice_name: '% Mujer Primera Autora'
   viz_type: big_number_total
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_mujer_primera", "y_axis_format": ".2f", "header_font_size":
-    0.3}'
+  params: '{"metric": {"label": "pct_mujer_primera"}, "y_axis_format": ".2f"}'
   description: '% Mujer Primera Autora'
 - slice_name: '% Mujer Ultima Autora (PI)'
   viz_type: big_number_total
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_mujer_ult", "y_axis_format": ".2f"}'
+  params: '{"metric": {"label": "pct_mujer_ult"}, "y_axis_format": ".2f"}'
   description: '% Mujer Ultima Autora (PI)'
 - slice_name: Papers por Area (treemap)
   viz_type: treemap
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": ["IdArea"], "custom_label": "papers"}'
+  params: '{"metric": {"label": "count"}, "groupby": ["IdArea"]}'
   description: Papers por Area (treemap)

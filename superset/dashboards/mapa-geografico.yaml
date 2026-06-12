@@ -1,0 +1,17 @@
+dashboard_title: 07 - Mapa Geografico
+slug: mapa-geografico
+description: Distribucion de papers por pais en el mundo
+css: ''
+position_json: '{}'
+json_metadata: '{}'
+published: false
+version: 1.0.0
+charts:
+- slice_name: Papers por Pais (mapa mundial)
+  viz_type: world_map
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metric": {"label": "count"}, "entity": "country_name", "country_fieldtype":
+    "cca2", "groupby": ["NombrePais"], "viz_type": "world_map"}'
+  description: Papers por Pais (mapa mundial)

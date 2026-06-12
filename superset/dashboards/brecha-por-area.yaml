@@ -3,7 +3,7 @@ slug: brecha-por-area
 description: Comparacion de la brecha entre areas cientificas
 css: ''
 position_json: '{}'
-json_metadata: '{"CHART-KEY":"val"}'
+json_metadata: '{}'
 published: false
 version: 1.0.0
 charts:
@@ -12,27 +12,31 @@ charts:
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metrics": ["pct_mujer_primera", "pct_mujer_ult"], "groupby": "IdArea",
-    "show_legend": true, "y_axis_format": ".1f"}'
+  params: '{"metrics": [{"label": "pct_mujer_primera"}, {"label": "pct_mujer_ult"}],
+    "groupby": ["IdArea"], "show_legend": true, "y_axis_format": ".1f", "groupby_type":
+    "dimension", "show_total": false}'
   description: '% Mujer Primera vs Ultima por Area'
 - slice_name: Papers totales por Area
   viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "count", "groupby": "IdArea", "y_axis_format": ",d"}'
+  params: '{"metrics": [{"label": "count"}], "groupby": ["IdArea"], "y_axis_format":
+    ",d", "row_limit": 30}'
   description: Papers totales por Area
 - slice_name: '% Con Mujeres por Area'
   viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_con_mujeres", "groupby": "IdArea", "y_axis_format": ".1f"}'
+  params: '{"metrics": [{"label": "pct_con_mujeres"}], "groupby": ["IdArea"], "y_axis_format":
+    ".1f", "row_limit": 30}'
   description: '% Con Mujeres por Area'
-- slice_name: Brecha Primera - Ultima por Area
+- slice_name: '% Unipersonal por Area'
   viz_type: bar
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": "pct_mujer_primera", "groupby": "IdArea", "y_axis_format": ".1f"}'
-  description: Brecha Primera - Ultima por Area
+  params: '{"metrics": [{"label": "pct_unipersonal"}], "groupby": ["IdArea"], "y_axis_format":
+    ".1f", "row_limit": 30}'
+  description: '% Unipersonal por Area'
