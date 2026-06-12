@@ -32,7 +32,7 @@ en el mismo PR que cierra cada task.
 
 - [x] **TASK-03-001** — `docker-compose.yml` con Superset + Nginx (landing en :8080, Superset en :8088)
 - [x] **TASK-03-002** — Datasets: 6 datasets (5 dims + Fact_Paper) + 14 métricas virtuales en `Fact_Paper`. Round-trip YAML probado. Idempotente via `init_datasets.py`.
-- [ ] **TASK-03-003** — Dashboards (manuales via UI, 6 dashboards temáticos)
+- [x] **TASK-03-003** — Dashboards: 6 dashboards temáticos via ORM con 23 charts total (big_number, dist_bar, line, treemap, pie, pivot_table). Round-trip YAML exportado a `superset/dashboards/*.yaml`. Anonymous users pueden renderizar charts via `/api/v1/chart/data` con permisos `all_datasource_access` en rol `Public`. Idempotente via `init_dashboards.py`.
 - [ ] **TASK-03-004** — Landing page + i18n español
 - [ ] **TASK-03-005** — Verificación + cierre EPIC-03 (README)
 

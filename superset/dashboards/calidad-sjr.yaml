@@ -1,0 +1,33 @@
+dashboard_title: 06 - Calidad (SJR)
+slug: calidad-sjr
+description: Relacion entre factor de impacto y brecha de genero
+css: ''
+position_json: '{}'
+json_metadata: '{"CHART-KEY":"val"}'
+published: false
+version: 1.0.0
+charts:
+- slice_name: Top 20 Journals por Papers
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metric": "count", "groupby": "IdJournal", "row_limit": 20, "y_axis_format":
+    ",d"}'
+  description: Top 20 Journals por Papers
+- slice_name: '% Mujer Ultima por Top 20 Journals'
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metric": "pct_mujer_ult", "groupby": "IdJournal", "row_limit": 20, "y_axis_format":
+    ".1f"}'
+  description: '% Mujer Ultima por Top 20 Journals'
+- slice_name: Papers por Anio con SJR (pivot)
+  viz_type: pivot_table_v2
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metric": "count", "groupby": ["IdJournal", "IdTiempo"], "row_limit":
+    50}'
+  description: Papers por Anio con SJR (pivot)

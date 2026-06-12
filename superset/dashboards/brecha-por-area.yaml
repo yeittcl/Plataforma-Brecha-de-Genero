@@ -1,0 +1,38 @@
+dashboard_title: 02 - Brecha por Area
+slug: brecha-por-area
+description: Comparacion de la brecha entre areas cientificas
+css: ''
+position_json: '{}'
+json_metadata: '{"CHART-KEY":"val"}'
+published: false
+version: 1.0.0
+charts:
+- slice_name: '% Mujer Primera vs Ultima por Area'
+  viz_type: dist_bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": ["pct_mujer_primera", "pct_mujer_ult"], "groupby": "IdArea",
+    "show_legend": true, "y_axis_format": ".1f"}'
+  description: '% Mujer Primera vs Ultima por Area'
+- slice_name: Papers totales por Area
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metric": "count", "groupby": "IdArea", "y_axis_format": ",d"}'
+  description: Papers totales por Area
+- slice_name: '% Con Mujeres por Area'
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metric": "pct_con_mujeres", "groupby": "IdArea", "y_axis_format": ".1f"}'
+  description: '% Con Mujeres por Area'
+- slice_name: Brecha Primera - Ultima por Area
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metric": "pct_mujer_primera", "groupby": "IdArea", "y_axis_format": ".1f"}'
+  description: Brecha Primera - Ultima por Area

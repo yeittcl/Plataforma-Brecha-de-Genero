@@ -130,6 +130,8 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 | Re-create Superset datasets| `docker compose run --rm superset python3 /app/cfg/init_datasets.py` (idempotent) |
 | Export datasets to YAML    | `docker compose run --rm superset python3 /app/cfg/export_datasets.py`           |
 | Import datasets from YAML  | `docker compose run --rm superset python3 /app/cfg/import_datasets.py` (idempotent) |
+| Re-create Superset dashboards | `docker compose run --rm superset python3 /app/cfg/init_dashboards.py` (idempotent) |
+| Export dashboards to YAML    | `docker compose run --rm superset python3 /app/cfg/export_dashboards.py`          |
 
 ## Conventions
 
@@ -157,6 +159,8 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 - **ClickHouse SQL: prefer `IF(cond, a, b)` over `CASE WHEN`** for virtual metrics. `CASE WHEN` works in raw queries but some Superset-injected wrappers choke on it.
 - **Superset `import-datasources` CLI expects a single ZIP** with a specific schema (`version` + `databases` keys, with each database listing datasources by relative YAML path). It does NOT accept a directory of YAMLs. For round-trip we use a Python script (`superset/config/import_datasets.py`) that iterates YAMLs and inserts via ORM. The CANONICAL way to (re)create datasets is `init_datasets.py`; YAMLs are an exportable backup only.
 - **Superset 3.1.3 supports at most 8 levels of `else:` nesting in `bash` heredocs before choking** with cryptic `SyntaxError`. Avoid complex conditionals inside `superset shell <<PYEOF` — keep the logic in a real Python file and call it with `importlib.util.spec_from_file_location` (see `init_db.py`).
+- **Superset `chart/data` endpoint requires explicit permissions** on the Public role for anonymous users to render charts. The Public role must have `all_datasource_access` perm on the view named `all_datasource_access` (self-referential, via `can_access_all_datasources` check). Without this, anon users get 403 `DATASOURCE_SECURITY_ACCESS_ERROR`. The setup is in `superset/config/grant_public_all.py` (run after `init_dashboards.py`).
+- **Superset ORM field names differ from the database columns**: `Dashboard.title` → actually `dashboard_title`. Other gotchas: `Slice` has no `dash_id`, use `dashboards=[dash]` relationship. `created_by_fk` and `changed_by_fk` must be set explicitly (otherwise `None`) for the API to see the dataset.
 
 ## When this file needs updating
 
