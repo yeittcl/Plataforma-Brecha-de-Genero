@@ -44,6 +44,79 @@ services:
       timeout: 5s
       retries: 10
 
+  superset:
+    build:
+      context: ./superset
+      dockerfile: Dockerfile
+    container_name: memoria-superset
+    restart: unless-stopped
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL}
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST_INTERNAL}
+      CLICKHOUSE_HTTP_PORT: ${CLICKHOUSE_HTTP_PORT}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+    ports:
+      - "${SUPERSET_PORT:-8088}:8088"
+    volumes:
+      - superset_data:/app/superset_home
+      - ./superset/config/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/config/init_admin.sh:/app/init_admin.sh:ro
+      - ./superset/config/init_db.py:/app/init_db.py:ro
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8088/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  superset-init:
+    build:
+      context: ./superset
+      dockerfile: Dockerfile
+    container_name: memoria-superset-init
+    command: ["/app/init_admin.sh"]
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL}
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST_INTERNAL}
+      CLICKHOUSE_HTTP_PORT: ${CLICKHOUSE_HTTP_PORT}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+    volumes:
+      - superset_data:/app/superset_home
+      - ./superset/config/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/config/init_admin.sh:/app/init_admin.sh:ro
+      - ./superset/config/init_db.py:/app/init_db.py:ro
+    depends_on:
+      superset:
+        condition: service_healthy
+    restart: "no"
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: memoria-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+    depends_on:
+      superset:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   clickhouse_data:
+  superset_data:

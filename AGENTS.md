@@ -100,6 +100,7 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 - Python 3.11+ with `venv`
 - Docker + Docker Compose v2
 - ~4 GB RAM free (ClickHouse + Superset are hungry)
+- ~5 GB RAM free when Superset + Nginx are running (EPIC-03)
 
 ## Setup
 
@@ -124,7 +125,8 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 | Load SJR factors           | `python -m etl.load_postgres_sjr`                             |
 | Verify Postgres            | `python -m etl.verify`                                        |
 | Transform → ClickHouse     | `python -m etl.load_clickhouse`                               |
-| Open Superset              | http://localhost:8088                                         |
+| Open public landing        | http://localhost:8080                                         |
+| Open Superset (admin)      | http://localhost:8088                                         |
 
 ## Conventions
 
@@ -143,6 +145,9 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 - Run ETL scripts as modules: `python -m etl.<script>` (not `python etl/<script>.py`). The `etl/` package needs `__init__.py` and `-m` adds the project root to `sys.path` so internal imports resolve.
 - ClickHouse columns with non-ASCII names (e.g. `Año`) must be backtick-quoted in DDL. From PowerShell, `clickhouse-client --query` mangles `ñ` — workaround: `CREATE VIEW v_X AS SELECT "A" || char(0xC3) || char(0xB1) || "o" AS Year FROM X` then JOIN the view, or query through `clickhouse_connect` (HTTP) which handles UTF-8.
 - ClickHouse JOIN cardinality: dim tables may have multiple rows per natural key (e.g. `Dim_Area` has one row per (IdArea, NombreCategoria) pair). In analytical JOINs use `JOIN (SELECT DISTINCT ... FROM dim)` to avoid cartesian product inflating counts.
+- **Superset Python scripts that need an app context** (e.g. `init_db.py`): `from superset.app import create_app` triggers `superset/__init__.py` which evaluates `app: Flask = current_app` at module import time. To avoid `RuntimeError: Working outside of application context`, load the script via `importlib.util.spec_from_file_location` (NOT plain `import` or `python script.py`), and import models **inside** `app.app_context()`. See `superset/config/init_db.py` for the working pattern.
+- **`superset shell` heredoc** in bash strips leading whitespace — do not use Python `if/else` with indented blocks inside `<<PYEOF`. Prefer `importlib` + a real Python file.
+- **Superset `set-role` CLI does not exist** in 3.x. Use `PUBLIC_ROLE_LIKE = "Gamma"` in `superset_config.py` so the `Public` role automatically inherits Gamma's read-only permissions.
 
 ## When this file needs updating
 

@@ -28,12 +28,14 @@ en el mismo PR que cierra cada task.
 
 ## EPIC-03 — Apache Superset (BI)
 
-**Status**: pending
+**Status**: in-progress
 
-- [ ] **TASK-03-001** — `docker-compose.yml` con Superset
+- [x] **TASK-03-001** — `docker-compose.yml` con Superset + Nginx (landing en :8080, Superset en :8088)
 - [ ] **TASK-03-002** — Conexión ClickHouse en Superset
 - [ ] **TASK-03-003** — Datasets y dimensiones
 - [ ] **TASK-03-004** — Dashboards
+- [ ] **TASK-03-005** — Landing page + i18n español
+- [ ] **TASK-03-006** — Verificación + cierre EPIC-03 (README)
 
 ## Leyenda
 - `[ ]` pending
