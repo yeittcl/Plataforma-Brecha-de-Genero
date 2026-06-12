@@ -24,7 +24,7 @@ en el mismo PR que cierra cada task.
 
 - [x] **TASK-02-001** — Crear DDL de ClickHouse (`db/clickhouse_schema.sql`)
 - [x] **TASK-02-002** — Implementar `etl/load_clickhouse.py` (Postgres → ClickHouse)
-- [~] **TASK-02-003** — Verificación: counts, sample queries OLAP
+- [x] **TASK-02-003** — Verificación: counts, sample queries OLAP
 
 ## EPIC-03 — Apache Superset (BI)
 
