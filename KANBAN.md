@@ -20,7 +20,7 @@ en el mismo PR que cierra cada task.
 
 ## EPIC-02 — ETL + ClickHouse (DW analítico)
 
-**Status**: in-progress
+**Status**: done (released as v0.2.0)
 
 - [x] **TASK-02-001** — Crear DDL de ClickHouse (`db/clickhouse_schema.sql`)
 - [x] **TASK-02-002** — Implementar `etl/load_clickhouse.py` (Postgres → ClickHouse)

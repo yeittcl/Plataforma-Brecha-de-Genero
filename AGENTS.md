@@ -141,6 +141,8 @@ Vive en `KANBAN.md` (raíz). Se actualiza junto con el PR que cierra la task. No
 - Large CSV loads: prefer `COPY` (psycopg `copy_expert`) over row-by-row `INSERT`.
 - `data/` and `.env` are gitignored. CSVs come from the original source — do not commit them.
 - Run ETL scripts as modules: `python -m etl.<script>` (not `python etl/<script>.py`). The `etl/` package needs `__init__.py` and `-m` adds the project root to `sys.path` so internal imports resolve.
+- ClickHouse columns with non-ASCII names (e.g. `Año`) must be backtick-quoted in DDL. From PowerShell, `clickhouse-client --query` mangles `ñ` — workaround: `CREATE VIEW v_X AS SELECT "A" || char(0xC3) || char(0xB1) || "o" AS Year FROM X` then JOIN the view, or query through `clickhouse_connect` (HTTP) which handles UTF-8.
+- ClickHouse JOIN cardinality: dim tables may have multiple rows per natural key (e.g. `Dim_Area` has one row per (IdArea, NombreCategoria) pair). In analytical JOINs use `JOIN (SELECT DISTINCT ... FROM dim)` to avoid cartesian product inflating counts.
 
 ## When this file needs updating
 
