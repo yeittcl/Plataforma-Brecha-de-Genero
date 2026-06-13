@@ -12,26 +12,30 @@ charts:
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": {"label": "count"}, "y_axis_format": ",d"}'
+  params: '{"metric": {"label": "count", "expressionType": "SQL", "sqlExpression":
+    "COUNT(*)"}, "y_axis_format": ",d"}'
   description: Total de papers
 - slice_name: '% Mujer Primera Autora'
   viz_type: big_number_total
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": {"label": "pct_mujer_primera"}, "y_axis_format": ".2f"}'
+  params: '{"metric": {"label": "pct_mujer_primera", "expressionType": "SQL", "sqlExpression":
+    "SUM(Mujer_primera) * 100.0 / COUNT(*)"}, "y_axis_format": ".2f"}'
   description: '% Mujer Primera Autora'
 - slice_name: '% Mujer Ultima Autora (PI)'
   viz_type: big_number_total
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": {"label": "pct_mujer_ult"}, "y_axis_format": ".2f"}'
+  params: '{"metric": {"label": "pct_mujer_ult", "expressionType": "SQL", "sqlExpression":
+    "SUM(Mujer_ult) * 100.0 / COUNT(*)"}, "y_axis_format": ".2f"}'
   description: '% Mujer Ultima Autora (PI)'
 - slice_name: Papers por Area (treemap)
   viz_type: treemap
   datasource_id: 6
   datasource_type: table
   datasource_name: memoria.Fact_Paper
-  params: '{"metric": {"label": "count"}, "groupby": ["IdArea"]}'
+  params: '{"metric": {"label": "count", "expressionType": "SQL", "sqlExpression":
+    "COUNT(*)"}, "groupby": ["IdArea"]}'
   description: Papers por Area (treemap)

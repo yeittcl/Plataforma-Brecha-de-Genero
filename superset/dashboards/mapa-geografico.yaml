@@ -9,9 +9,10 @@ version: 1.0.0
 charts:
 - slice_name: Papers por Pais (mapa mundial)
   viz_type: world_map
-  datasource_id: 6
+  datasource_id: 7
   datasource_type: table
-  datasource_name: memoria.Fact_Paper
-  params: '{"metric": {"label": "count"}, "entity": "country_name", "country_fieldtype":
-    "cca2", "groupby": ["NombrePais"], "viz_type": "world_map"}'
+  datasource_name: memoria.ds_fact_paper_by_country
+  params: '{"metric": {"label": "count", "expressionType": "SQL", "sqlExpression":
+    "COUNT(*)"}, "entity": "NombrePais", "country_fieldtype": "cca2", "groupby": ["NombrePais"],
+    "viz_type": "world_map"}'
   description: Papers por Pais (mapa mundial)
