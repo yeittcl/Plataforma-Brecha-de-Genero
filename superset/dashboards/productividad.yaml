@@ -1,0 +1,34 @@
+dashboard_title: 05 - Productividad y Autoria
+slug: productividad
+description: Distribucion de autoria y colaboracion
+css: ''
+position_json: '{}'
+json_metadata: '{}'
+published: false
+version: 1.0.0
+charts:
+- slice_name: Distribucion N Autores
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "count", "expressionType": "SQL", "sqlExpression":
+    "COUNT(*)"}], "groupby": ["N_autores"], "y_axis_format": ",d"}'
+  description: Distribucion N Autores
+- slice_name: Distribucion N Mujeres
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "count", "expressionType": "SQL", "sqlExpression":
+    "COUNT(*)"}], "groupby": ["N_mujeres"], "y_axis_format": ",d"}'
+  description: Distribucion N Mujeres
+- slice_name: '% Mujer Primera vs N Autores'
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "pct_mujer_primera", "expressionType": "SQL", "sqlExpression":
+    "SUM(Mujer_primera) * 100.0 / COUNT(*)"}], "groupby": ["N_autores"], "y_axis_format":
+    ".1f"}'
+  description: '% Mujer Primera vs N Autores'

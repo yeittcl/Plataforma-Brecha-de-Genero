@@ -1,0 +1,35 @@
+dashboard_title: 04 - Brecha Geografica
+slug: brecha-geografica
+description: Distribucion por paises y regiones
+css: ''
+position_json: '{}'
+json_metadata: '{}'
+published: false
+version: 1.0.0
+charts:
+- slice_name: '% Mujer Ultima por Region'
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "pct_mujer_ult", "expressionType": "SQL", "sqlExpression":
+    "SUM(Mujer_ult) * 100.0 / COUNT(*)"}], "groupby": ["IdGeo"], "y_axis_format":
+    ".1f", "row_limit": 30}'
+  description: '% Mujer Ultima por Region'
+- slice_name: Top 20 Paises por Papers
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "count", "expressionType": "SQL", "sqlExpression":
+    "COUNT(*)"}], "groupby": ["IdGeo"], "row_limit": 20, "y_axis_format": ",d"}'
+  description: Top 20 Paises por Papers
+- slice_name: '% Mujer Primera por Region'
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "pct_mujer_primera", "expressionType": "SQL", "sqlExpression":
+    "SUM(Mujer_primera) * 100.0 / COUNT(*)"}], "groupby": ["IdGeo"], "y_axis_format":
+    ".1f", "row_limit": 30}'
+  description: '% Mujer Primera por Region'

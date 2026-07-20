@@ -1,0 +1,46 @@
+dashboard_title: 02 - Brecha por Area
+slug: brecha-por-area
+description: Comparacion de la brecha entre areas cientificas
+css: ''
+position_json: '{}'
+json_metadata: '{}'
+published: false
+version: 1.0.0
+charts:
+- slice_name: '% Mujer Primera vs Ultima por Area'
+  viz_type: dist_bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "pct_mujer_primera", "expressionType": "SQL", "sqlExpression":
+    "SUM(Mujer_primera) * 100.0 / COUNT(*)"}, {"label": "pct_mujer_ult", "expressionType":
+    "SQL", "sqlExpression": "SUM(Mujer_ult) * 100.0 / COUNT(*)"}], "groupby": ["IdArea"],
+    "show_legend": true, "y_axis_format": ".1f", "groupby_type": "dimension", "show_total":
+    false}'
+  description: '% Mujer Primera vs Ultima por Area'
+- slice_name: Papers totales por Area
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "count", "expressionType": "SQL", "sqlExpression":
+    "COUNT(*)"}], "groupby": ["IdArea"], "y_axis_format": ",d", "row_limit": 30}'
+  description: Papers totales por Area
+- slice_name: '% Con Mujeres por Area'
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "pct_con_mujeres", "expressionType": "SQL", "sqlExpression":
+    "SUM(Hay_mujeres) * 100.0 / COUNT(*)"}], "groupby": ["IdArea"], "y_axis_format":
+    ".1f", "row_limit": 30}'
+  description: '% Con Mujeres por Area'
+- slice_name: '% Unipersonal por Area'
+  viz_type: bar
+  datasource_id: 6
+  datasource_type: table
+  datasource_name: memoria.Fact_Paper
+  params: '{"metrics": [{"label": "pct_unipersonal", "expressionType": "SQL", "sqlExpression":
+    "SUM(IF(N_autores = 1, 1, 0)) * 100.0 / COUNT(*)"}], "groupby": ["IdArea"], "y_axis_format":
+    ".1f", "row_limit": 30}'
+  description: '% Unipersonal por Area'

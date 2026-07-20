@@ -1,11 +1,17 @@
-table_name: Fact_Paper
+table_name: ds_fact_paper_by_country
 main_dttm_col: null
-description: 'Fact Paper: 1 fila por paper, con flags de genero'
+description: Fact_Paper JOIN Dim_Geografica para mapas (excluye Unknown)
 default_endpoint: null
 offset: 0
 cache_timeout: null
 schema: memoria
-sql: null
+sql: "\nSELECT\n    f.IdPaper AS IdPaper,\n    f.IdTiempo AS IdTiempo,\n    f.IdJournal\
+  \ AS IdJournal,\n    f.IdArea AS IdArea,\n    g.NombrePais AS NombrePais,\n    g.NombreRegion\
+  \ AS NombreRegion,\n    f.Mujer_primera AS Mujer_primera,\n    f.Mujer_penult AS\
+  \ Mujer_penult,\n    f.Mujer_ult AS Mujer_ult,\n    f.Hay_mujeres AS Hay_mujeres,\n\
+  \    f.Mujer_Autora AS Mujer_Autora,\n    f.N_mujeres AS N_mujeres,\n    f.N_autores\
+  \ AS N_autores\nFROM Fact_Paper f\nINNER JOIN Dim_Geografica g ON g.IdGeo = f.IdGeo\n\
+  WHERE g.NombrePais != 'Unknown'\n"
 params: null
 template_params: null
 filter_select_enabled: true
@@ -14,29 +20,11 @@ extra: null
 normalize_columns: false
 always_filter_main_dttm: false
 metrics:
-- metric_name: pct_unipersonal
-  verbose_name: null
-  metric_type: number
-  expression: SUM(IF(N_autores = 1, 1, 0)) * 100.0 / COUNT(*)
-  description: 'Virtual metric: pct_unipersonal'
-  d3format: null
-  currency: null
-  extra: null
-  warning_text: null
-- metric_name: pct_unipersonal_mujer
-  verbose_name: null
-  metric_type: number
-  expression: SUM(Mujer_Autora) * 100.0 / COUNT(*)
-  description: 'Virtual metric: pct_unipersonal_mujer'
-  d3format: null
-  currency: null
-  extra: null
-  warning_text: null
 - metric_name: pct_con_mujeres
   verbose_name: null
   metric_type: number
   expression: SUM(Hay_mujeres) * 100.0 / COUNT(*)
-  description: 'Virtual metric: pct_con_mujeres'
+  description: null
   d3format: null
   currency: null
   extra: null
@@ -45,16 +33,7 @@ metrics:
   verbose_name: null
   metric_type: number
   expression: SUM(Mujer_primera) * 100.0 / COUNT(*)
-  description: 'Virtual metric: pct_mujer_primera'
-  d3format: null
-  currency: null
-  extra: null
-  warning_text: null
-- metric_name: pct_mujer_penult
-  verbose_name: null
-  metric_type: number
-  expression: SUM(Mujer_penult) * 100.0 / COUNT(*)
-  description: 'Virtual metric: pct_mujer_penult'
+  description: null
   d3format: null
   currency: null
   extra: null
@@ -63,7 +42,7 @@ metrics:
   verbose_name: null
   metric_type: number
   expression: SUM(Mujer_ult) * 100.0 / COUNT(*)
-  description: 'Virtual metric: pct_mujer_ult'
+  description: null
   d3format: null
   currency: null
   extra: null
@@ -72,34 +51,7 @@ metrics:
   verbose_name: null
   metric_type: number
   expression: COUNT(*)
-  description: 'Virtual metric: count'
-  d3format: null
-  currency: null
-  extra: null
-  warning_text: null
-- metric_name: avg_n_autores
-  verbose_name: null
-  metric_type: number
-  expression: AVG(N_autores)
-  description: 'Virtual metric: avg_n_autores'
-  d3format: null
-  currency: null
-  extra: null
-  warning_text: null
-- metric_name: avg_n_mujeres
-  verbose_name: null
-  metric_type: number
-  expression: AVG(N_mujeres)
-  description: 'Virtual metric: avg_n_mujeres'
-  d3format: null
-  currency: null
-  extra: null
-  warning_text: null
-- metric_name: n_unipersonal_mujer
-  verbose_name: null
-  metric_type: number
-  expression: SUM(Mujer_Autora)
-  description: 'Virtual metric: n_unipersonal_mujer'
+  description: null
   d3format: null
   currency: null
   extra: null
@@ -108,7 +60,7 @@ metrics:
   verbose_name: null
   metric_type: number
   expression: SUM(Hay_mujeres)
-  description: 'Virtual metric: n_con_mujeres'
+  description: null
   d3format: null
   currency: null
   extra: null
@@ -117,16 +69,7 @@ metrics:
   verbose_name: null
   metric_type: number
   expression: SUM(Mujer_primera)
-  description: 'Virtual metric: n_mujer_primera'
-  d3format: null
-  currency: null
-  extra: null
-  warning_text: null
-- metric_name: n_mujer_penult
-  verbose_name: null
-  metric_type: number
-  expression: SUM(Mujer_penult)
-  description: 'Virtual metric: n_mujer_penult'
+  description: null
   d3format: null
   currency: null
   extra: null
@@ -135,17 +78,41 @@ metrics:
   verbose_name: null
   metric_type: number
   expression: SUM(Mujer_ult)
-  description: 'Virtual metric: n_mujer_ult'
+  description: null
   d3format: null
   currency: null
   extra: null
   warning_text: null
 columns:
-- column_name: IdArea
+- column_name: NombrePais
   verbose_name: null
   is_dttm: false
   is_active: true
   type: VARCHAR
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: NombreRegion
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: VARCHAR
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: null
+- column_name: IdArea
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: INTEGER
   advanced_data_type: null
   groupby: false
   filterable: true
@@ -157,7 +124,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: true
   filterable: true
@@ -169,22 +136,10 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: false
   filterable: false
-  expression: null
-  description: null
-  python_date_format: null
-  extra: null
-- column_name: IdGeo
-  verbose_name: null
-  is_dttm: false
-  is_active: true
-  type: VARCHAR
-  advanced_data_type: null
-  groupby: false
-  filterable: true
   expression: null
   description: null
   python_date_format: null
@@ -193,7 +148,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: false
   filterable: true
@@ -205,7 +160,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: false
   filterable: true
@@ -217,7 +172,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: true
   filterable: true
@@ -229,7 +184,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: true
   filterable: true
@@ -241,7 +196,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: true
   filterable: true
@@ -253,7 +208,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: true
   filterable: true
@@ -265,7 +220,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: true
   filterable: true
@@ -277,7 +232,7 @@ columns:
   verbose_name: null
   is_dttm: false
   is_active: true
-  type: VARCHAR
+  type: INTEGER
   advanced_data_type: null
   groupby: true
   filterable: true
