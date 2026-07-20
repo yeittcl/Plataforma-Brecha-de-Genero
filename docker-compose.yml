@@ -114,7 +114,48 @@ services:
       superset:
         condition: service_healthy
 
+  redis:
+    image: redis:7-alpine
+    container_name: memoria-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  superset-worker:
+    build:
+      context: ./superset
+      dockerfile: Dockerfile
+    container_name: memoria-superset-worker
+    restart: unless-stopped
+    command: ["celery", "--app=superset.tasks.celery_app:celery_app", "worker", "--concurrency=2", "--loglevel=info", "--hostname=worker1@%%h"]
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      CLICKHOUSE_HOST: ${CLICKHOUSE_HOST_INTERNAL}
+      CLICKHOUSE_HTTP_PORT: ${CLICKHOUSE_HTTP_PORT}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+    volumes:
+      - superset_data:/app/superset_home
+      - ./superset/config/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/config:/app/cfg:ro
+    depends_on:
+      superset:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   clickhouse_data:
   superset_data:
+  redis_data:

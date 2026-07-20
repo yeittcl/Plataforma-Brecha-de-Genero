@@ -34,4 +34,7 @@ echo "[init] Public role mirrors Gamma via PUBLIC_ROLE_LIKE config (no action ne
 echo "[init] Importing database connection for ClickHouse..."
 python3 -c "import importlib.util; spec = importlib.util.spec_from_file_location('init_db', '/app/cfg/init_db.py'); mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); mod.main()"
 
+echo "[init] Disabling async queries for ClickHouse DB (workaround for SQL Lab 3.1.3 + clickhouse-sqlalchemy 0.2.7 incompat)..."
+python3 -c "import importlib.util; spec = importlib.util.spec_from_file_location('disable_async', '/app/cfg/disable_async.py'); mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); mod.main()"
+
 echo "[init] Done."
