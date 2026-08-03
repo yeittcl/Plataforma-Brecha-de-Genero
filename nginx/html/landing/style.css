@@ -232,13 +232,16 @@ body {
   background: var(--ink);
   color: var(--bg);
   cursor: pointer;
+}
+
+.scroll-anim .to-top {
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.to-top.show {
+.scroll-anim .to-top.show {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -254,27 +257,15 @@ body {
   outline-offset: 3px;
 }
 
-.reveal {
+.scroll-anim .reveal {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.reveal.in {
+.scroll-anim .reveal.in {
   opacity: 1;
   transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
 }
 
 @media (max-width: 560px) {
