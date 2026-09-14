@@ -34,8 +34,16 @@ en el mismo PR que cierra cada task.
 - [x] **TASK-03-002** — Datasets: 6 datasets (5 dims + Fact_Paper) + 14 métricas virtuales en `Fact_Paper`. Round-trip YAML probado. Idempotente via `init_datasets.py`.
 - [x] **TASK-03-003** — Dashboards (manuales via UI, 6 dashboards temáticos)
 - [x] **TASK-03-004** — Infra Celery + Redis para SQL Lab (redis 7, superset-worker). Workaround para incompat 3.1.3+clickhouse-sqlalchemy 0.2.7: `allow_run_async=False` en la DB ClickHouse (sync only). SQL Lab funciona end-to-end. Tambien incluye: Nginx routing (Superset en raiz, landing en /landing/), proxy Host fix, DASHBOARD_RBAC, LOGO_TARGET_PATH, landing page.
-- [~] **TASK-03-005** — Landing page + i18n español
+- [x] **TASK-03-005** — Landing page + i18n español
 - [ ] **TASK-03-006** — Verificación + cierre EPIC-03 (README)
+
+## EPIC-04 — Testing
+
+**Status**: in-progress
+
+- [x] **TASK-04-001** — Unit tests: 49 tests para funciones puras (normalize_position, normalize_country, truncate, strip_accents, _quote_col, _extract_position_from_id, parse_sjr_value, find_journal_id, SQL helper, DATASETS, METRICS, DASHBOARDS)
+- [x] **TASK-04-002** — Integration tests: schema validation (Postgres + ClickHouse DDL), data quality
+- [x] **TASK-04-003** — E2E tests: ETL module importability (syntax check)
 
 ## Leyenda
 - `[ ]` pending
