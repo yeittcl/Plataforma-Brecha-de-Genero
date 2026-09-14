@@ -23,6 +23,7 @@ data/**
 !data/**/
 !data/**/.gitkeep
 !data/postgres.zip
+!data/superset.zip
 
 # Local backup of the original (unordered) data dump. Not part of the repo.
 originalData/
