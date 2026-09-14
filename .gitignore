@@ -22,6 +22,7 @@ env/
 data/**
 !data/**/
 !data/**/.gitkeep
+!data/postgres.zip
 
 # Local backup of the original (unordered) data dump. Not part of the repo.
 originalData/
