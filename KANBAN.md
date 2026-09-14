@@ -35,7 +35,7 @@ en el mismo PR que cierra cada task.
 - [x] **TASK-03-003** — Dashboards (manuales via UI, 6 dashboards temáticos)
 - [x] **TASK-03-004** — Infra Celery + Redis para SQL Lab (redis 7, superset-worker). Workaround para incompat 3.1.3+clickhouse-sqlalchemy 0.2.7: `allow_run_async=False` en la DB ClickHouse (sync only). SQL Lab funciona end-to-end. Tambien incluye: Nginx routing (Superset en raiz, landing en /landing/), proxy Host fix, DASHBOARD_RBAC, LOGO_TARGET_PATH, landing page.
 - [x] **TASK-03-005** — Landing page + i18n español
-- [ ] **TASK-03-006** — Verificación + cierre EPIC-03 (README)
+- [x] **TASK-03-006** — Verificación + cierre EPIC-03 (README)
 
 ## EPIC-04 — Testing
 
