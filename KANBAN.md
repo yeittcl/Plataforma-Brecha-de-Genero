@@ -28,7 +28,7 @@ en el mismo PR que cierra cada task.
 
 ## EPIC-03 — Apache Superset (BI)
 
-**Status**: in-progress
+**Status**: done (released as v0.3.0)
 
 - [x] **TASK-03-001** — `docker-compose.yml` con Superset + Nginx (landing en :8080, Superset en :8088)
 - [x] **TASK-03-002** — Datasets: 6 datasets (5 dims + Fact_Paper) + 14 métricas virtuales en `Fact_Paper`. Round-trip YAML probado. Idempotente via `init_datasets.py`.
@@ -39,7 +39,7 @@ en el mismo PR que cierra cada task.
 
 ## EPIC-04 — Testing
 
-**Status**: in-progress
+**Status**: done (released as v0.3.0)
 
 - [x] **TASK-04-001** — Unit tests: 49 tests para funciones puras (normalize_position, normalize_country, truncate, strip_accents, _quote_col, _extract_position_from_id, parse_sjr_value, find_journal_id, SQL helper, DATASETS, METRICS, DASHBOARDS)
 - [x] **TASK-04-002** — Integration tests: schema validation (Postgres + ClickHouse DDL), data quality
